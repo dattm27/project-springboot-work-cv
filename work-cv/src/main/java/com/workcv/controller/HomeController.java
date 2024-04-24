@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class HomeController {
 	@GetMapping("/")
 	public String showPage() {
@@ -18,5 +18,9 @@ public class HomeController {
 	@GetMapping("/employer")
 	public String employer() {
 		return  "This is employer" ;
+	}
+	@GetMapping("/signin")
+	public String signin() {
+		return  "login-form" ;
 	}
 }

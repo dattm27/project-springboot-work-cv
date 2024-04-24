@@ -23,10 +23,10 @@
 			</div>
 			<div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
 
-				<form th:action="@{/auth/login}" method="post">
+				<form th:action="@{login}" method="post"  >
 					<div class="form-outline mb-4">
 						<label for="email" class="form-label">Email:</label>
-						<input type="email" class="form-control" id="email" name="email" th:value="${param.email}"
+						<input type="email" class="form-control" id="email" name="username" th:value="${param.email}"
 							required>
 					</div>
 					<div class="" form-outline mb-4>

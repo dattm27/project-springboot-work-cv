@@ -6,6 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +28,9 @@ import com.workcv.service.UserService;
 public class AuthController {
 	@Autowired
     private UserService userService; // Đây là một interface/service xử lý logic liên quan đến người dùng
-	@GetMapping("/login")
+	//process đăng nhập được config trong security
+
+	@GetMapping("/signin")
 	public String showLoginForm() {
 		return "login-form";
 	}
@@ -40,6 +47,7 @@ public class AuthController {
 	        model.addAttribute("error", "Tài khoản hoặc mật khẩu không đúng. Vui lòng thử lại");
 	        return "login-form";
 	    }
+		  
 	}
 	
 	

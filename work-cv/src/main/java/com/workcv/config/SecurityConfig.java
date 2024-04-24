@@ -22,16 +22,36 @@ public class SecurityConfig  {
 	private UserDetailsService userDetailsService;
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		
 		return http
+				
 				.authorizeHttpRequests(auth -> {
 					auth.requestMatchers("/").permitAll();
-
+					auth.requestMatchers("/user/list").hasAnyAuthority("candidate");
+					auth.requestMatchers("/user/signup").permitAll();
+					auth.requestMatchers("/assets/**").permitAll();
+					auth.requestMatchers("user/assets/**").permitAll();
+					auth.requestMatchers("/auth/signin").permitAll();
+					auth.requestMatchers("/auth/signin/login").permitAll();
 					auth.requestMatchers("/employer").hasAnyAuthority("employer");
 					auth.requestMatchers("/candidate").hasAnyAuthority("candidate");
 					auth.anyRequest().authenticated();
+					
+					
 				})
-				.oauth2Login(withDefaults())
-				.formLogin(withDefaults())
+//				.oauth2Login(oauth2Login ->
+//	            oauth2Login
+//	                .loginPage("/login-form.html") // Sử dụng trang đăng nhập tùy chỉnh
+//				)
+				.formLogin(formLogin ->
+		            formLogin
+		                .loginPage("/signin") // Sử dụng trang đăng nhập tùy chỉnh
+		                .loginProcessingUrl("/login").permitAll()
+//		                .defaultSuccessUrl("/", true)
+//                        .failureUrl("/custom-login.html.html?error=true")
+					)
+//				.oauth2Login(withDefaults())
+//				.formLogin(withDefaults())
 				.build();
 	};
 	@Bean

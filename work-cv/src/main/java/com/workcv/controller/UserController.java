@@ -15,7 +15,7 @@ import com.workcv.service.UserService;
 public class UserController {
 	@Autowired
 	private UserService userService;
-
+	@GetMapping("/list")
 	public String showList(Model model) {
 		model.addAttribute("listUsers", userService.getAllUsers() );
 		return "list";
