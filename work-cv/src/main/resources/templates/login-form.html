@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Work CV - Login</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+
+<body>
+	<div class="container mt-4">
+		<c:url var="WELCOME" value="WelcomeControllerServlet">
+		</c:url>
+		<h2> <a href="/">WorkCV</a></h2>
+
+	</div>
+	<div class="container-fluid h-custom" style="margin-top: 20vh">
+		<div class="row d-flex justify-content-center align-items-center h-100">
+			<div class="col-md-9 col-lg-6 col-xl-5">
+				<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+					class="img-fluid" alt="Sample image">
+			</div>
+			<div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+
+				<form th:action="@{/auth/login}" method="post">
+					<div class="form-outline mb-4">
+						<label for="email" class="form-label">Email:</label>
+						<input type="email" class="form-control" id="email" name="email" th:value="${param.email}"
+							required>
+					</div>
+					<div class="" form-outline mb-4>
+						<label for="password" class="form-label">Password:</label>
+						<input type="password" class="form-control" id="password" name="password"
+							th:value="${param.password}" required>
+					</div>
+
+
+					<div th:if=" ${error}" class="text-danger text-center mt-2 " id="error-message">
+						<p th:text="${error}">Thông tin đăng nhập không đúng. Vui lòng thử lại.</p>
+					</div>
+					<script>
+						// Ẩn thông báo lỗi khi không có hoạt động nhập liệu
+						document.addEventListener('DOMContentLoaded', function () {
+							var emailInput = document.getElementById('email');
+							var passwordInput = document.getElementById('password');
+							var errorMessage = document.getElementById('error-message');
+
+							// Lắng nghe sự kiện nhập liệu trên input email và password
+							emailInput.addEventListener('input', hideErrorMessage);
+							passwordInput.addEventListener('input', hideErrorMessage);
+
+							// Hàm ẩn thông báo lỗi
+							function hideErrorMessage() {
+								errorMessage.style.display = 'none';
+							}
+						});
+					</script>
+					<div class="text-center text-lg-start mt-4 pt-2">
+						<button type="submit" class="btn btn-primary btn-lg"
+							style="padding-left: 2.5rem; padding-right: 2.5rem;">Đăng nhập</button>
+						<p class="small fw-bold mt-2 pt-1 mb-0">Không có tài khoản? <a href="/user/signup"
+								class="link-danger">Đăng ký</a></p>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script th:if="${sign_up_success}">
+		// Sử dụng JavaScript để hiển thị thông báo
+		alert("Thông báo đăng ký thành công, vui lòng đăng nhập");
+	</script>
+</body>
+
+</html>

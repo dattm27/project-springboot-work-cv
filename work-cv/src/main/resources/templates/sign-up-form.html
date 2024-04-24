@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Work CV - Sign up</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+	<div class="container mt-4">
+		<c:url var="WELCOME" value="WelcomeControllerServlet">
+		</c:url>
+		<h2> <a href="/">WorkCV</a></h2>
+
+	</div>
+	<div class="container-fluid h-custom" style="margin-top: 5vh">
+		<div class="row d-flex justify-content-center align-items-center h-100">
+			<div class="col-md-9 col-lg-6 col-xl-5">
+				<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+					class="img-fluid" alt="Sample image">
+			</div>
+			<div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+
+				<form th:action="@{/user/signup}" method="post">
+					<div class="form-outline mb-4">
+						<label for="full-name" class="form-label">Họ và tên:</label>
+						<input type="text" class="form-control" id="full-name" name="full-name"
+							th:value="${param.fullName}" required>
+					</div>
+					<div class="form-outline mb-4">
+						<label for="email" class="form-label">Email:</label>
+						<input type="email" class="form-control" id="email" name="email" th:value="${param.email}"
+							required>
+					</div>
+					<div class="form-outline mb-4">
+						<label for="password" class="form-label">Password:</label>
+						<input type="password" class="form-control" id="password" name="password"
+							th:value="${param.password}" required pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}">
+						<small>Mật khẩu tối thiểu 8 ký tự, bao gồm cả chữ cái và số</small>
+					</div>
+
+					<div class="form-outline mb-3">
+						<label for="password" class="form-label"> Xác nhận mật khẩu:</label>
+						<input type="password" class="form-control" id="re_password" name="re_password" required
+							pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}">
+						<small id="passwordMismatchError" class="error mt-1 text-danger" style="display: none;">Hai mật
+							khẩu chưa trùng khớp</small>
+					</div>
+
+					<!-- Dropdown cho vai trò -->
+					<div class="form-outline mb-4">
+						<label for="role" class="form-label">Vai trò:</label>
+						<select class="form-control" id="role" name="role">
+							<option value="candidate">Ứng viên</option>
+							<option value="employer">Nhà tuyển dụng</option>
+						</select>
+					</div>
+
+					<div th:if=" ${error}" class="text-danger text-center mt-2 " id="error-message">
+						<p>Thông tin đăng nhập không đúng. Vui lòng thử lại.</p>
+					</div>
+					<div class="text-center text-lg-start mt-2 pt-2">
+						<button type="submit" class="btn btn-primary btn-lg"
+							style="padding-left: 2.5rem; padding-right: 2.5rem;" id="submitButton">Đăng ký</button>
+
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			var fullName = document.getElementById('full-name');
+			var passwordInput = document.getElementById('password');
+			var rePasswordInput = document.getElementById('re_password');
+			var passwordMismatchError = document.getElementById('passwordMismatchError');
+			var emailInput = document.getElementById('email');
+			var passwordInput = document.getElementById('password');
+			var errorMessage = document.getElementById('error-message');
+			var submitButton = document.getElementById('submitButton');
+			var submitButton = document.getElementById('submitButton');
+
+			// Lắng nghe sự kiện nhập liệu trên cả hai trường mật khẩu
+			passwordInput.addEventListener('input', checkPasswordMatch);
+			rePasswordInput.addEventListener('input', checkPasswordMatch);
+
+			// Hàm kiểm tra sự trùng khớp giữa hai trường mật khẩu
+			function checkPasswordMatch() {
+				var password = passwordInput.value;
+				var rePassword = rePasswordInput.value;
+				if (password !== "" && rePassword !== "" && password !== rePassword) {
+					passwordMismatchError.style.display = 'block';
+					submitButton.setAttribute('disabled', 'disabled'); // Vô hiệu hóa nút submit
+
+				} else {
+					passwordMismatchError.style.display = 'none';
+					submitButton.removeAttribute('disabled'); // Kích hoạt nút submit
+				}
+			}
+			// Lắng nghe sự kiện nhập liệu trên input email và password
+			fullName.addEventListener('input', hideErrorMessage);
+			emailInput.addEventListener('input', hideErrorMessage);
+			passwordInput.addEventListener('input', hideErrorMessage);
+
+			// Hàm ẩn thông báo lỗi
+			function hideErrorMessage() {
+				errorMessage.style.display = 'none';
+			}
+		});
+	</script>
+
+</body>
+
+</html>
