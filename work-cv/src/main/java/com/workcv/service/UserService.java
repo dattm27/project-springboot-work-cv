@@ -11,4 +11,5 @@ public interface UserService {
 	String getFullnameByEmail(String email);
 	boolean registerUser(String fullName, String email, String password, String role);
 	String getRoleByEmail(String email);
+	User getUserByEmail(String email);
 }

@@ -13,13 +13,14 @@ import com.workcv.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class HomeController {
 	@Autowired
     private UserService userService; // Đây là một interface/service xử lý logic liên quan đến người dùng
 	@GetMapping("/")
-	public String showPage(Model model) {
+	public String showPage(HttpServletRequest request, Model model) {
 		// Lấy đối tượng Authentication từ SecurityContextHolder
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -29,9 +30,18 @@ public class HomeController {
 	        String username = userService.getFullnameByEmail(authentication.getName());
 	        //lấy vai trò người dùng để hiển thị các chức năng tương ứng
 	        String role = userService.getRoleByEmail(authentication.getName());
+	        //chỉ cần chọn một trong hai cách để truyền đi username password
 	        //thêm vào model các thuộc tính tên người dùng và vai trò
+	        
+	        
 	        model.addAttribute("username", username);
 	        model.addAttribute("role", role);
+	        
+	        //thêm thông tin người dùng vào phiên đăng nhập
+	     
+	        HttpSession session = request.getSession();
+	        session.setAttribute("username", username);
+	        session.setAttribute("role", role);
 	    }
 		return "index";
 	}

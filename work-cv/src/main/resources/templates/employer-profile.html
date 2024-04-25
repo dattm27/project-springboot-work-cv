@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Hồ sơ - Work CV </title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+	<!-- Include navbar -->
+	<nav th:replace="fragments :: navbar"></nav>
+	<div th:text="${role}"></div>
+	<div class="container">
+		<h3 class="mt-1">Cập nhật thông tin công ty</h3>
+		<form th:action="@{/employer/save-company}" th:object="${company}" method="post" enctype="multipart/form-data">
+			<div class="row">
+				<!-- Cột chứa ảnh của công ty -->
+				<div class="col-md-5">
+					<div class="mb-3">
+						<label for="image" class="form-label">Chọn ảnh</label>
+						<input type="file" class="form-control" id="image" name="image" accept="image/*">
+					</div>
+					<div class="mb-3">
+						<div id="imagePreviewContainer" class="mt-3">
+							<p id="previewLabel">Preview:</p>
+							<div id="previewImage"></div>
+							<button type="button" class="btn btn-danger mt-2" id="deleteImageButton"
+								style="display: none;">Xoá ảnh</button>
+						</div>
+					</div>
+				</div>
+				<!-- Cột chứa thông tin cơ bản của công ty -->
+				<div class="col-md-7">
+					<div class="mb-3">
+						<label for="name" class="form-label">Tên công ty</label>
+						<input type="text" class="form-control" id="name" th:field="*{name}" required>
+					</div>
+					<div class="mb-3">
+						<label for="address" class="form-label">Địa chỉ</label>
+						<input type="text" class="form-control" id="address" th:field="*{address}" required>
+					</div>
+					<div class="mb-3">
+						<label for="email" class="form-label">Email</label>
+						<input type="email" class="form-control" id="email" th:field="*{email}" required>
+					</div>
+					<div class="mb-3">
+						<label for="phone_number" class="form-label">Số điện thoại</label>
+						<input type="tel" class="form-control" id="phone_number" th:field="*{phoneNumber}" required>
+					</div>
+					<div class="mb-3">
+						<label for="description" class="form-label">Mô tả</label>
+						<textarea class="form-control" id="description" th:field="*{description}" rows="3"
+							required></textarea>
+					</div>
+					
+					<div class="mb-3">
+						<label for="status" class="form-label">Status</label>
+						<select class="form-select " id="status" th:field="*{status}" required>
+							<option value="1">Active</option>
+							<option value="0">Inactive</option>
+						</select>
+					</div>
+					<button type="submit" class="btn btn-primary">Save</button>
+				</div>
+			</div>
+
+		</form>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+		<!--Script xử lý hiển thị ảnh khi tải lên-->
+		document.getElementById('uploadImage').addEventListener('change', function (event) {
+			var file = event.target.files[0];
+			var reader = new FileReader();
+
+			reader.onload = function (e) {
+				var preview = document.getElementById('previewImage');
+				var image = new Image();
+				image.src = e.target.result;
+				image.className = 'img-fluid';
+				preview.innerHTML = '';
+				preview.appendChild(image);
+				document.getElementById('deleteImageButton').style.display = 'block'; // hiển thị nút xoá ảnh
+			};
+
+			reader.readAsDataURL(file);
+		});
+		//Xử lý xoá ảnh vừa tải lên
+		document.getElementById('deleteImageButton').addEventListener('click', function () {
+			document.getElementById('previewImage').innerHTML = '';
+			this.style.display = 'none';
+			document.getElementById('uploadImage').value = ''; // Xóa giá trị đã chọn trong input file
+		});
+	</script>
+	<!-- Script để lắng nghe sự kiện chọn file và gán giá trị vào cho logo -->
+	<script type="text/javascript">
+		document.getElementById('uploadLogo').addEventListener('change', function (event) {
+			var logoFileName = event.target.files[0].name;
+			document.getElementById('logo').value = logoFileName;
+		});
+	</script>
+	<style>
+		#previewImage {
+        max-width: 100%;
+        max-height: 450px; /* Đặt giới hạn chiều cao của ảnh */
+        overflow: hidden; /* Ẩn phần dư thừa của ảnh nếu nó quá lớn */
+    }
+	</style>
+	
+</body>
+
+</html>
