@@ -30,7 +30,7 @@ public class SecurityConfig {
 			auth.requestMatchers("/").permitAll();
 			auth.requestMatchers("/user/list").hasAnyAuthority("employer");
 			auth.requestMatchers("/user/signup").permitAll();
-			auth.requestMatchers("/signin").permitAll();
+			
 			auth.requestMatchers("/assets/**").permitAll();
 			auth.requestMatchers("user/assets/**").permitAll();
 			auth.requestMatchers("/logout").permitAll();
@@ -46,8 +46,8 @@ public class SecurityConfig {
 //	                .loginPage("/login-form.html") // Sử dụng trang đăng nhập tùy chỉnh
 //				)
 				.formLogin(formLogin -> formLogin.loginPage("/signin") // Sử dụng trang đăng nhập tùy chỉnh
-						.loginProcessingUrl("/login").permitAll().defaultSuccessUrl("/", true)
-						.failureUrl("/login?error=true")
+						.loginProcessingUrl("/login").defaultSuccessUrl("/", true)
+						.failureUrl("/signin?error").permitAll() // khi đăng nhập sai -> trả về trang đăng nhập kèm báo lỗi
 
 				).logout(logout -> logout.logoutUrl("/signout") // Endpoint cho việc đăng xuất
 						.logoutSuccessUrl("/") // URL sau khi đăng xuất thành công
