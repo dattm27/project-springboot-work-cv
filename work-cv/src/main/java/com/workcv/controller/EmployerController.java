@@ -7,16 +7,23 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
@@ -33,18 +40,31 @@ public class EmployerController {
 	private CompanyService companyService;
 	@Autowired
 	private UserService userService;
-	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/images";
+	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/employer";
 
 	@GetMapping("/company-profile")
-	public String editProfile(HttpServletRequest request, Model model) {
+	public String editProfile(HttpServletRequest request, Model model) throws IOException {
+		 // Kiểm tra xem flash scope có chứa attribute "updateSuccess" không - tức là lúc này vừa mới cập nhật xong là được redirect
+	    if (request.getAttribute("updateSuccess") != null) {
+	        // Nếu có, thêm giá trị của attribute vào model
+	        model.addAttribute("updateSuccess", request.getAttribute("updateSuccess"));
+	        System.out.print("OK");
+	    }
+	    
 		HttpSession session = request.getSession();
 		// Lấy thông tin người dùng từ session để lấy thông tin công ty
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		Company existingCompany = currentUser.getUser().getCompany();
+		int userId = currentUser.getId(); 
+		 // Lấy thông tin công ty từ endpoint /data/{user_id}
+		Company existingCompany =  getCompanyById(userId).getBody() ;
 		if (existingCompany != null) { // nếu đã có thông tin công ty rồi
 			model.addAttribute("company", existingCompany);
-		} else {
+			Resource imageResource = getProfileImage(userId).getBody();
+			// Thêm hình ảnh vào model
+			
+		    model.addAttribute("imageResource", imageResource);
+		} else {// nếu chưa tạo thông tin công ty
 			// tạo đối tượng company mới
 			Company company = new Company();
 
@@ -62,13 +82,16 @@ public class EmployerController {
 	@PostMapping("/save-company")
 	// Lưu thông tin của company vào database
 	public String saveCompany(@ModelAttribute("company") Company company, @RequestParam("image") MultipartFile file,
-			Authentication authentication) throws IOException {
+			Authentication authentication, RedirectAttributes redirectAttributes) throws IOException {
 		// Kiểm tra xem thông tin công ty cũ đã tồn tại trong cơ sở dữ liệu hay chưa
 
 		CustomUserDetails currentUser = (CustomUserDetails) authentication.getPrincipal();// Lấy xem user nào đang thực
 																							// thực hiện cập nhật thông
 																							// tin công ty
-		Company existingCompany = currentUser.getUser().getCompany();
+		int userId = currentUser.getId(); 
+		 // Lấy thông tin công ty từ endpoint /data/{user_id}
+		
+		Company existingCompany =  getCompanyById(userId).getBody() ;
 
 		if (existingCompany != null) {
 			// Cập nhật thông tin công ty
@@ -110,31 +133,30 @@ public class EmployerController {
 			companyService.save(existingCompany);
 		} else {
 			// Trường hợp chưa có sẵn thông tin công ty trong cơ sở dữ liệu
-			if (file.isEmpty()) {
-				// Xử lý lỗi: không có tệp ảnh được chọn
-				throw new RuntimeException("No image file selected");
+			if (!file.isEmpty()) {
+				String originalFilename = file.getOriginalFilename();
+				// Kiểm tra định dạng tệp ảnh (nếu cần)
+				String[] allowedFileTypes = { "image/jpeg", "image/png", "image/gif" }; // Thêm định dạng tệp hình ảnh được
+																						// phép
+				if (!Arrays.asList(allowedFileTypes).contains(file.getContentType())) {
+					// Xử lý lỗi: định dạng tệp không hợp lệ
+					throw new RuntimeException("Invalid file format. Only JPEG, PNG, and GIF files are allowed");
+				}
+
+				Path fileNameAndPath = Paths.get(uploadDirectory, originalFilename);
+				try {
+					// Ghi tệp ảnh vào thư mục lưu trữ
+					Files.write(fileNameAndPath, file.getBytes());
+					// Cập nhật tên tệp ảnh trong đối tượng company
+					company.setLogo(originalFilename);
+
+				} catch (IOException e) {
+					// Xử lý lỗi: không thể ghi tệp ảnh vào thư mục lưu trữ
+					throw new RuntimeException("Failed to save image file", e);
+				}
 			}
 
-			String originalFilename = file.getOriginalFilename();
-			// Kiểm tra định dạng tệp ảnh (nếu cần)
-			String[] allowedFileTypes = { "image/jpeg", "image/png", "image/gif" }; // Thêm định dạng tệp hình ảnh được
-																					// phép
-			if (!Arrays.asList(allowedFileTypes).contains(file.getContentType())) {
-				// Xử lý lỗi: định dạng tệp không hợp lệ
-				throw new RuntimeException("Invalid file format. Only JPEG, PNG, and GIF files are allowed");
-			}
-
-			Path fileNameAndPath = Paths.get(uploadDirectory, originalFilename);
-			try {
-				// Ghi tệp ảnh vào thư mục lưu trữ
-				Files.write(fileNameAndPath, file.getBytes());
-				// Cập nhật tên tệp ảnh trong đối tượng company
-				company.setLogo(originalFilename);
-
-			} catch (IOException e) {
-				// Xử lý lỗi: không thể ghi tệp ảnh vào thư mục lưu trữ
-				throw new RuntimeException("Failed to save image file", e);
-			}
+			
 			// Thực hiện lưu thông tin công ty vào cơ sở dữ liệu
 			// Ví dụ:
 			// Lấy xem user nào đang thực thực hiện cập nhật thông tin công ty
@@ -142,8 +164,33 @@ public class EmployerController {
 			// Thêm user đó vào company
 			company.setUser(userService.getUserByEmail(currentUser.getUsername()));
 			Company savedCompany = companyService.save(company);
+			 
+			
 		}
-		return "employer-profile";
+		// Thêm thông điệp vào RedirectAttributes
+        redirectAttributes.addFlashAttribute("updateSuccess", true);
+        System.out.print("updateSuccess set at save-company");
+		return "redirect:/employer/company-profile";
+	}
+	
+	//Fetching data by user_id
+	@GetMapping("/data/{user_id}")
+	public ResponseEntity<Company> getCompanyById(@PathVariable int user_id ){
+		Company company = companyService.getCompanyByUserId(user_id);
+		return ResponseEntity.ok().body(company);
+	}
+	
+	//Fetching the image of a particular company
+	@GetMapping("/profileImage/{user_id}")
+	public ResponseEntity<Resource> getProfileImage(@PathVariable int user_id) throws IOException {
+		Company company = companyService.getCompanyByUserId(user_id);
+		//Get the image from the company object
+		Path imagePath = Paths.get(uploadDirectory, company.getLogo());
+		
+		//Fetching the image from that particular path
+		Resource resource  =new FileSystemResource(imagePath.toFile());;
+		String contentType = Files.probeContentType(imagePath);
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
 	}
 
 }

@@ -116,16 +116,5 @@ public class User {
 		this.role = role;
 	}
 
-	@OneToOne(mappedBy = "user")
-	private Company company;
-
-	// Getter và setter cho trường company
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
 
 }

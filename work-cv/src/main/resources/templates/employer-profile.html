@@ -12,31 +12,41 @@
 
 	<!-- Include navbar -->
 	<nav th:replace="fragments :: navbar"></nav>
-	
+
 	<div class="container">
 		<h3 class="mt-1">Cập nhật thông tin công ty</h3>
+
+		<div th:if="${updateSuccess}">
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				Cập nhật thông tin thành công
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+		</div>
 		<form th:action="@{/employer/save-company}" th:object="${company}" method="post" enctype="multipart/form-data">
 			<div class="row">
 				<!-- Cột chứa ảnh của công ty -->
 				<div class="col-md-5">
 					<div class="mb-3">
 						<label for="image" class="form-label">Chọn ảnh</label>
-						<input type="file" class="form-control" id="image" name="image" accept="image/*">
+						<input type="file" class="form-control" id="uploadImage" name="image" accept="image/*">
 					</div>
 					<div class="mb-3">
 						<div id="imagePreviewContainer" class="mt-3">
 							<p id="previewLabel">Preview:</p>
-							<div id="previewImage"></div>
+							<div id="previewImage" class="previewImageStyle"></div>
+							<img id="oldImage" class="previewImageStyle" th:if="${imageResource}"  th:src="${imageResource.getFilename()}" alt="Hình ảnh người dùng"/>
 							<button type="button" class="btn btn-danger mt-2" id="deleteImageButton"
 								style="display: none;">Xoá ảnh</button>
 						</div>
+						
+						
 					</div>
 				</div>
 				<!-- Cột chứa thông tin cơ bản của công ty -->
 				<div class="col-md-7">
 					<div class="mb-3">
 						<label for="name" class="form-label">Tên công ty</label>
-						<input type="text" class="form-control" id="name" th:field="*{name}"  required>
+						<input type="text" class="form-control" id="name" th:field="*{name}" required>
 					</div>
 					<div class="mb-3">
 						<label for="address" class="form-label">Địa chỉ</label>
@@ -55,7 +65,7 @@
 						<textarea class="form-control" id="description" th:field="*{description}" rows="3"
 							required></textarea>
 					</div>
-					
+
 					<div class="mb-3">
 						<label for="status" class="form-label">Status</label>
 						<select class="form-select " id="status" th:field="*{status}" required>
@@ -79,6 +89,7 @@
 			var reader = new FileReader();
 
 			reader.onload = function (e) {
+				document.getElementById('oldImage').style.display = "none"; //ẩn ảnh gốc
 				var preview = document.getElementById('previewImage');
 				var image = new Image();
 				image.src = e.target.result;
@@ -86,6 +97,7 @@
 				preview.innerHTML = '';
 				preview.appendChild(image);
 				document.getElementById('deleteImageButton').style.display = 'block'; // hiển thị nút xoá ảnh
+				
 			};
 
 			reader.readAsDataURL(file);
@@ -98,20 +110,22 @@
 		});
 	</script>
 	<!-- Script để lắng nghe sự kiện chọn file và gán giá trị vào cho logo -->
-	<script type="text/javascript">
+	<!--<script type="text/javascript">
 		document.getElementById('uploadLogo').addEventListener('change', function (event) {
 			var logoFileName = event.target.files[0].name;
 			document.getElementById('logo').value = logoFileName;
-		});
+		});-->
 	</script>
 	<style>
-		#previewImage {
-        max-width: 100%;
-        max-height: 450px; /* Đặt giới hạn chiều cao của ảnh */
-        overflow: hidden; /* Ẩn phần dư thừa của ảnh nếu nó quá lớn */
-    }
+		.previewImageStyle {
+			max-width: 100%;
+			max-height: 450px;
+			/* Đặt giới hạn chiều cao của ảnh */
+			overflow: hidden;
+			/* Ẩn phần dư thừa của ảnh nếu nó quá lớn */
+		}
 	</style>
-	
+
 </body>
 
 </html>
