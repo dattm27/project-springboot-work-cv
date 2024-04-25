@@ -44,10 +44,19 @@ public class UserServiceImpl implements UserService {
 		
 	}
 	@Override
-	public boolean isEmailExisted(String email) {
-		// TODO Auto-generated method stub
-		return false;
+	public String getFullnameByEmail(String email) {
+		User user = userRepository.findByEmail(email);
+	    if(user != null) return user.getFullName();
+		return null;
 	}
+	@Override
+	public String getRoleByEmail(String email) {
+		User user = userRepository.findByEmail(email);
+		if (user!= null) return user.getRole();
+		return null;
+	}
+	
+
 	
 
 }

@@ -25,8 +25,10 @@
 	<link rel="stylesheet" href="/assets/css/icomoon.css">
 	<link rel="stylesheet" href="/assets/css/style.css">
 	<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap-grid.css">
-	<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap-reboot.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap-reboot.css"> 
 	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
 	<!-- JS -->
 	<script src="/assets/js/jquery.min.js"></script>
 	<script src="/assets/js/jquery-migrate-3.0.1.min.js"></script>
@@ -46,52 +48,106 @@
 	<script src="/assets/js/main.js"></script>
 	<script src="https://cdn.ckeditor.com/ckeditor5/29.0.0/classic/ckeditor.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	
 </head>
 
 <body>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<div class="container-fluid px-md-4	">
+	<!--Nav bar dành cho nhà tuyển dụng -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" th:if="${role =='employer'}">
+		<div class="container-fluid px-md-4">
 			<a class="navbar-brand" href="/">Work CV</a>
-
-			<div class="collapse navbar-collapse" id="ftco-nav">
-				<ul class="navbar-nav ml-auto">
-					<li class="nav-item active"><a href="/" class="nav-link">Trang
-							chủ</a></li>
-					<li class="'nav-item"><a href="/" class="nav-link">Công
-							việc</a></li>
-					<li class="nav-item"><a href="/user/list" class="nav-link">Ứng cử
-							viên</a></li>
-					<ul class="dropdown">
-						<li><a href="/">Hồ Sơ</a></li>
-						<li><a href="/save-job/get-list">Công việc đã lưu</a></li>
-						<li><a href="/user/list-post">Danh sách bài đăng</a></li>
-						<li><a href="/user/get-list-apply">Công việc đã ứng
-								tuyển</a></li>
-						<li><a href="/user/get-list-company">Công ty đã theo
-								dõi</a></li>
-						<li><a href="/auth/logout">Đăng xuất</a></li>
-					</ul>
-					<li></li>
-					<li class="nav-item cta mr-md-1"><a href="/recruitment/post" class="nav-link">Đăng tuyển</a></li>
-					<!-- Kiểm tra xem người dùng đã đăng nhập chưa -->
-					<li class="nav-item" th:unless="${loggedInUser != null}">
-					    <a class="nav-link" href="/signin">Đăng nhập</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="/">Trang chủ</a>
 					</li>
-					<li class="nav-item dropdown" th:if="${loggedInUser != null}">
-					    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="${loggedInUser}">
-					        Đã đăng nhập
-					    </a>
-					    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-					        <a class="dropdown-item" href="/profile">Hồ sơ</a>
-					        <a class="dropdown-item" href="/settings">Cài đặt</a>
-					        <a class="dropdown-item" href="/signout">Đăng xuất</a>
-					    </div>
+					<li class="nav-item">
+						<a class="nav-link" href="/">Công việc</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/user/list">Ứng cử viên</a>
+					</li>
+					
+					<li class="nav-item">
+						<a class="nav-link" href="/recruitment/post">Đăng tuyển</a>
+					</li>
+					<!-- Kiểm tra xem người dùng đã đăng nhập chưa -->
+					<li class="nav-item" th:unless="${username != null}">
+						<a class="nav-link" href="/signin">Đăng nhập</a>
+					</li>
+				
+					<li class="nav-item dropdown" th:if="${username != null}">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+							data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="${username}">
+							Đã đăng nhập
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<li><a class="dropdown-item" href="/employer/profile">Hồ sơ</a></li>
+							<li><a class="dropdown-item" href="/settings">Cài đặt</a></li>
+							<li><a class="dropdown-item" href="/signout">Đăng xuất</a></li>
+						</ul>
 					</li>
 				</ul>
 			</div>
 		</div>
 	</nav>
+	<!--Navbar dành cho ứng cứ viên-->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" th:unless="${role =='employer'}">
+		<div class="container-fluid px-md-4">
+			<a class="navbar-brand" href="/">Work CV</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="/">Trang chủ</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/">Công việc</a>
+					</li>
+				
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+							data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Hồ Sơ
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<li><a class="dropdown-item" href="/">Hồ Sơ</a></li>
+							<li><a class="dropdown-item" href="/save-job/get-list">Công việc đã lưu</a></li>
+							<li><a class="dropdown-item" href="/user/list-post">Danh sách bài đăng</a></li>
+							<li><a class="dropdown-item" href="/user/get-list-apply">Công việc đã ứng tuyển</a></li>
+							<li><a class="dropdown-item" href="/user/get-list-company">Công ty đã theo dõi</a></li>
+						
+						</ul>
+					</li>
+					
+					<!-- Kiểm tra xem người dùng đã đăng nhập chưa -->
+					<li class="nav-item" th:unless="${username != null}">
+						<a class="nav-link" href="/signin">Đăng nhập</a>
+					</li>
+				
+					<li class="nav-item dropdown" th:if="${username != null}">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+							data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="${username}">
+							Đã đăng nhập
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<li><a class="dropdown-item" href="/profile">Hồ sơ</a></li>
+							<li><a class="dropdown-item" href="/settings">Cài đặt</a></li>
+							<li><a class="dropdown-item" href="/signout">Đăng xuất</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
 	<!-- END nav -->
 	
 	<div th:if="${msg_register_success}" class="toast" data-delay="2000"
@@ -370,7 +426,7 @@
 							<span class="subheading">CÔNG VIỆC ĐƯỢC NHIỀU NGƯỜI ỨNG
 								TUYỂN</span>
 							<h2 class="mb-4">Các bài đăng về việc làm nổi bật</h2>
-							
+
 
 						</div>
 					</div>
@@ -729,7 +785,7 @@
 
 		}
 	</script>
-
+	  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

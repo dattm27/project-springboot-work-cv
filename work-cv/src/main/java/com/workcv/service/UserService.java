@@ -8,6 +8,7 @@ public interface UserService {
 	List<User> getAllUsers();
 
 	boolean authenticate(String email, String password);
-	boolean isEmailExisted(String email);
+	String getFullnameByEmail(String email);
 	boolean registerUser(String fullName, String email, String password, String role);
+	String getRoleByEmail(String email);
 }

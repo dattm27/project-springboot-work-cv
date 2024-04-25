@@ -9952,6 +9952,7 @@ textarea.form-control {
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -136px; } }
+/*
 .dropdown {
   visibility: hidden;
   opacity: 0;
@@ -10030,4 +10031,4 @@ textarea.form-control {
   transition-delay: 0s;
   margin-top: 0px;
   visibility: visible;
-  opacity: 1; }
+  opacity: 1; }*/

@@ -29,13 +29,13 @@ import com.workcv.service.UserService;
 public class AuthController {
 	@Autowired
     private UserService userService; // Đây là một interface/service xử lý logic liên quan đến người dùng
-	//process đăng nhập được config trong security
+	
 
 	@GetMapping("/signin")
 	public String showLoginForm() {
 		return "login-form";
 	}
-
+	//bỏ
 	@PostMapping("/login")
 	public String processLogin(HttpServletRequest request, @RequestParam("email") String email, @RequestParam("password") String password, Model model, RedirectAttributes redirectAttributes) {
 	    if (userService.authenticate(email, password)) {

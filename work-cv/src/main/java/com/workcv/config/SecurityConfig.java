@@ -20,21 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;;
 public class SecurityConfig {
 	@Autowired
 	private UserDetailsService userDetailsService;
-
-
-	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
 		http.authorizeHttpRequests(auth -> {
 			auth.requestMatchers("/").permitAll();
 			auth.requestMatchers("/user/list").hasAnyAuthority("employer");
 			auth.requestMatchers("/user/signup").permitAll();
-			
 			auth.requestMatchers("/assets/**").permitAll();
 			auth.requestMatchers("user/assets/**").permitAll();
 			auth.requestMatchers("/logout").permitAll();
-			auth.requestMatchers("/employer").hasAnyAuthority("employer");
+			auth.requestMatchers("/employer/**").hasAnyAuthority("employer");
 			auth.requestMatchers("/candidate").hasAnyAuthority("candidate");
 			auth.anyRequest().authenticated();
 
