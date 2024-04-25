@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,58 +33,117 @@ public class EmployerController {
 	private CompanyService companyService;
 	@Autowired
 	private UserService userService;
-	public static String uploadDirectory = System.getProperty("user.dir")+"/src/main/webapp/images";
-	
+	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/images";
+
 	@GetMapping("/company-profile")
-	public String editProfile(HttpServletRequest request, Model model ) {
-		//tạo đối tượng company mới
-		Company company = new Company ();
-		
-		//thêm vào attribute vào model
-		model.addAttribute("company" ,company);
-	    //Thêm thông tin user, role vào
+	public String editProfile(HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
-	    String username = (String) session.getAttribute("username");
+		// Lấy thông tin người dùng từ session để lấy thông tin công ty
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		Company existingCompany = currentUser.getUser().getCompany();
+		if (existingCompany != null) { // nếu đã có thông tin công ty rồi
+			model.addAttribute("company", existingCompany);
+		} else {
+			// tạo đối tượng company mới
+			Company company = new Company();
+
+			// thêm vào attribute vào model
+			model.addAttribute("company", company);
+		}
+		// Thêm thông tin user, role vào
+		String username = (String) session.getAttribute("username");
 		String role = (String) session.getAttribute("role");
 		model.addAttribute("username", username);
 		model.addAttribute("role", role);
 		return "employer-profile";
 	}
+
 	@PostMapping("/save-company")
 	// Lưu thông tin của company vào database
-	public String saveCompany(@ModelAttribute("company") Company company, @RequestParam("image") MultipartFile file, Authentication authentication) throws IOException {
-	    
-		if (file.isEmpty()) {
-	        // Xử lý lỗi: không có tệp ảnh được chọn
-	        throw new RuntimeException("No image file selected");
-	    }
+	public String saveCompany(@ModelAttribute("company") Company company, @RequestParam("image") MultipartFile file,
+			Authentication authentication) throws IOException {
+		// Kiểm tra xem thông tin công ty cũ đã tồn tại trong cơ sở dữ liệu hay chưa
 
-	    String originalFilename = file.getOriginalFilename();
-	    // Kiểm tra định dạng tệp ảnh (nếu cần)
-	    String[] allowedFileTypes = {"image/jpeg", "image/png", "image/gif"}; // Thêm định dạng tệp hình ảnh được phép
-	    if (!Arrays.asList(allowedFileTypes).contains(file.getContentType())) {
-	        // Xử lý lỗi: định dạng tệp không hợp lệ
-	        throw new RuntimeException("Invalid file format. Only JPEG, PNG, and GIF files are allowed");
-	    }
+		CustomUserDetails currentUser = (CustomUserDetails) authentication.getPrincipal();// Lấy xem user nào đang thực
+																							// thực hiện cập nhật thông
+																							// tin công ty
+		Company existingCompany = currentUser.getUser().getCompany();
 
-	    Path fileNameAndPath = Paths.get(uploadDirectory, originalFilename);
-	    try {
-	        // Ghi tệp ảnh vào thư mục lưu trữ
-	        Files.write(fileNameAndPath, file.getBytes());
-	        // Cập nhật tên tệp ảnh trong đối tượng company
-	        company.setLogo(originalFilename);
-	        // Thực hiện lưu thông tin công ty vào cơ sở dữ liệu
-	        // Ví dụ:
-	        //Lấy xem user nào đang thực thực hiện cập nhật thông tin công ty
-	        CustomUserDetails currentUser = ( CustomUserDetails) authentication.getPrincipal();
-	        //Thêm user đó vào company
-	        company.setUser(userService.getUserByEmail(currentUser.getUsername()));
-	        Company savedCompany = companyService.save(company);
-	        
-	        return "employer-profile";
-	    } catch (IOException e) {
-	        // Xử lý lỗi: không thể ghi tệp ảnh vào thư mục lưu trữ
-	        throw new RuntimeException("Failed to save image file", e);
-	    }
+		if (existingCompany != null) {
+			// Cập nhật thông tin công ty
+
+			// Kiểm tra xem người dùng có thay đổi ảnh không
+			if (file != null && !file.isEmpty()) {
+				// Xóa ảnh cũ nếu có
+				String oldLogo = existingCompany.getLogo();
+				if (oldLogo != null && !oldLogo.isEmpty()) {
+					Path oldLogoPath = Paths.get(uploadDirectory, oldLogo);
+					Files.deleteIfExists(oldLogoPath);
+				}
+
+				// Ảnh mới được chọn
+				String originalFilename = file.getOriginalFilename();
+				// Kiểm tra định dạng tệp ảnh (nếu cần)
+				String[] allowedFileTypes = { "image/jpeg", "image/png", "image/gif" }; // Thêm định dạng tệp hình ảnh
+																						// được phép
+				if (!Arrays.asList(allowedFileTypes).contains(file.getContentType())) {
+					// Xử lý lỗi: định dạng tệp không hợp lệ
+					throw new RuntimeException("Invalid file format. Only JPEG, PNG, and GIF files are allowed");
+				}
+				// Ghi tệp ảnh vào thư mục lưu trữ
+				Path fileNameAndPath = Paths.get(uploadDirectory, originalFilename);
+				Files.write(fileNameAndPath, file.getBytes());
+				// Cập nhật tên tệp ảnh trong đối tượng công ty
+				existingCompany.setLogo(originalFilename);
+			}
+
+			// Cập nhật thông tin công ty (tên, địa chỉ, email, ...)
+			existingCompany.setName(company.getName());
+			existingCompany.setAddress(company.getAddress());
+			existingCompany.setEmail(company.getEmail());
+			existingCompany.setPhoneNumber(company.getPhoneNumber());
+			existingCompany.setDescription(company.getDescription());
+			existingCompany.setStatus(company.getStatus());
+
+			// Thực hiện lưu thông tin công ty vào cơ sở dữ liệu
+			companyService.save(existingCompany);
+		} else {
+			// Trường hợp chưa có sẵn thông tin công ty trong cơ sở dữ liệu
+			if (file.isEmpty()) {
+				// Xử lý lỗi: không có tệp ảnh được chọn
+				throw new RuntimeException("No image file selected");
+			}
+
+			String originalFilename = file.getOriginalFilename();
+			// Kiểm tra định dạng tệp ảnh (nếu cần)
+			String[] allowedFileTypes = { "image/jpeg", "image/png", "image/gif" }; // Thêm định dạng tệp hình ảnh được
+																					// phép
+			if (!Arrays.asList(allowedFileTypes).contains(file.getContentType())) {
+				// Xử lý lỗi: định dạng tệp không hợp lệ
+				throw new RuntimeException("Invalid file format. Only JPEG, PNG, and GIF files are allowed");
+			}
+
+			Path fileNameAndPath = Paths.get(uploadDirectory, originalFilename);
+			try {
+				// Ghi tệp ảnh vào thư mục lưu trữ
+				Files.write(fileNameAndPath, file.getBytes());
+				// Cập nhật tên tệp ảnh trong đối tượng company
+				company.setLogo(originalFilename);
+
+			} catch (IOException e) {
+				// Xử lý lỗi: không thể ghi tệp ảnh vào thư mục lưu trữ
+				throw new RuntimeException("Failed to save image file", e);
+			}
+			// Thực hiện lưu thông tin công ty vào cơ sở dữ liệu
+			// Ví dụ:
+			// Lấy xem user nào đang thực thực hiện cập nhật thông tin công ty
+			currentUser = (CustomUserDetails) authentication.getPrincipal();
+			// Thêm user đó vào company
+			company.setUser(userService.getUserByEmail(currentUser.getUsername()));
+			Company savedCompany = companyService.save(company);
+		}
+		return "employer-profile";
 	}
+
 }

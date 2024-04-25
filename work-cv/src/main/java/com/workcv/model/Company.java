@@ -34,7 +34,7 @@ public class Company {
     @Column(name = "status")
     private Integer status;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 

@@ -12,7 +12,7 @@
 
 	<!-- Include navbar -->
 	<nav th:replace="fragments :: navbar"></nav>
-	<div th:text="${role}"></div>
+	
 	<div class="container">
 		<h3 class="mt-1">Cập nhật thông tin công ty</h3>
 		<form th:action="@{/employer/save-company}" th:object="${company}" method="post" enctype="multipart/form-data">
@@ -36,7 +36,7 @@
 				<div class="col-md-7">
 					<div class="mb-3">
 						<label for="name" class="form-label">Tên công ty</label>
-						<input type="text" class="form-control" id="name" th:field="*{name}" required>
+						<input type="text" class="form-control" id="name" th:field="*{name}"  required>
 					</div>
 					<div class="mb-3">
 						<label for="address" class="form-label">Địa chỉ</label>
