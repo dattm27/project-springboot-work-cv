@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Thông tin việc làm - Work CV</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+</head>
+
+<body>
+	<!--Thêm navbar -->
+	<nav th:replace="fragments :: navbar"></nav>
+
+	<!--Form tạo job -->
+	<div class="container">
+		<!--Alert tạo job thành công -->
+		<h3 class="mt-1">Chi tiết bài tuyển dụng </h3>
+		<div th:if="${saveJobSuccess}">
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				Cập nhật thông tin thành công
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+		</div>
+		<form  th:action="@{/job/save-job}"  method="post" th:object="${job}">
+			<div class="mb-3">
+				<label for="title" class="form-label">Tiêu đề:</label>
+				<input type="text" class="form-control" id="title" name="title" th:field="*{title}" required>
+			</div>
+			<div class="mb-3">
+				<label for="address" class="form-label">Địa chỉ làm việc:</label>
+				<input type="text" class="form-control" id="address" name="address" th:field="*{address}" required>
+			</div>
+			<div class="mb-3">
+				<label for="experience" class="form-label">Yêu cầu kinh nghiệm:</label>
+				<textarea class="form-control" id="experience" name="experience" th:field="*{experience}"></textarea>
+			</div>
+			<div class="mb-3">
+				<label for="salary" class="form-label">Lương:</label>
+				<input type="text" class="form-control" id="salary" name="salary" th:field="*{salary}" required>
+			</div>
+			<div class="mb-3">
+				<label for="deadline" class="form-label">Hạn nộp hồ sơ:</label>
+				<input type="text" class="form-control datepicker" id="deadline" name="deadline" required placeholder="dd/mm/yyyy">
+			</div>
+
+
+			<div class="mb-3">
+				<label for="description" class="form-label">Mô tả công việc:</label>
+				<textarea class="form-control" id="description" name="description" th:field="*{description}"
+					required></textarea>
+			</div>
+			<div class="mb-3">
+				<label for="category" class="form-label">Danh mục công việc:</label>
+				<select class="form-select" id="category" name="category" th:field="*{category}">
+					<option value="">Chọn danh mục</option>
+					<!-- Hiển thị danh sách các danh mục có sẵn -->
+					<option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">
+					</option>
+				</select>
+			</div>
+
+			<div class="mb-3">
+				<button type="submit" class="btn btn-primary">Tạo Công Việc Mới</button>
+			</div>
+	</div>
+	</form>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+	<!--Chọn ngày từ lịch-->
+	<script>
+		$(document).ready(function () {
+			$('.datepicker').datepicker({
+				format: 'dd/mm/yyyy', // Định dạng ngày: năm-tháng-ngày
+				todayBtn: "linked",
+				autoclose: true,
+				todayHighlight: true,
+				startDate: new Date() // Ngày bắt đầu là ngày hiện tại
+			});
+		});
+	</script>
+</body>
+
+</html>
