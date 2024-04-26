@@ -12,4 +12,6 @@ public interface UserService {
 	boolean registerUser(String fullName, String email, String password, String role);
 	String getRoleByEmail(String email);
 	User getUserByEmail(String email);
+
+	User save(User user);
 }

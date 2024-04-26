@@ -23,8 +23,8 @@ public class CompanyService {
 
 
 	public Company getCompanyByUserId(int id) {
-		Optional<Company> findByUserId = Optional.ofNullable(companyRepository.findCompanyByUserId(id));
-		Company company = findByUserId.get();
+		Company findByUserId = (companyRepository.findCompanyByUserId(id));
+		Company company = findByUserId;
 		return company;
 		
 		

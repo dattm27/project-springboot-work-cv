@@ -51,13 +51,13 @@ public class EmployerController {
 	        System.out.print("OK");
 	    }
 	    
-		HttpSession session = request.getSession();
+	
 		// Lấy thông tin người dùng từ session để lấy thông tin công ty
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		int userId = currentUser.getId(); 
 		 // Lấy thông tin công ty từ endpoint /data/{user_id}
-		Company existingCompany =  getCompanyById(userId).getBody() ;
+		Company existingCompany =  getCompanyByUserId(userId).getBody() ;
 		if (existingCompany != null) { // nếu đã có thông tin công ty rồi
 			model.addAttribute("company", existingCompany);
 			Resource imageResource = getProfileImage(userId).getBody();
@@ -72,8 +72,8 @@ public class EmployerController {
 			model.addAttribute("company", company);
 		}
 		// Thêm thông tin user, role vào
-		String username = (String) session.getAttribute("username");
-		String role = (String) session.getAttribute("role");
+		String username = (String) currentUser.getFullName(); // thêm tên người dùng vào để hiển thị trên navbar
+		String role = (String) currentUser.getRole();
 		model.addAttribute("username", username);
 		model.addAttribute("role", role);
 		return "employer-profile";
@@ -91,7 +91,7 @@ public class EmployerController {
 		int userId = currentUser.getId(); 
 		 // Lấy thông tin công ty từ endpoint /data/{user_id}
 		
-		Company existingCompany =  getCompanyById(userId).getBody() ;
+		Company existingCompany =  getCompanyByUserId(userId).getBody() ;
 
 		if (existingCompany != null) {
 			// Cập nhật thông tin công ty
@@ -136,7 +136,7 @@ public class EmployerController {
 			if (!file.isEmpty()) {
 				String originalFilename = file.getOriginalFilename();
 				// Kiểm tra định dạng tệp ảnh (nếu cần)
-				String[] allowedFileTypes = { "image/jpeg", "image/png", "image/gif" }; // Thêm định dạng tệp hình ảnh được
+				String[] allowedFileTypes = { "image/jpeg", "image/png", "image/gif", "image/jpg" }; // Thêm định dạng tệp hình ảnh được
 																						// phép
 				if (!Arrays.asList(allowedFileTypes).contains(file.getContentType())) {
 					// Xử lý lỗi: định dạng tệp không hợp lệ
@@ -175,7 +175,7 @@ public class EmployerController {
 	
 	//Fetching data by user_id
 	@GetMapping("/data/{user_id}")
-	public ResponseEntity<Company> getCompanyById(@PathVariable int user_id ){
+	public ResponseEntity<Company> getCompanyByUserId(@PathVariable int user_id ){
 		Company company = companyService.getCompanyByUserId(user_id);
 		return ResponseEntity.ok().body(company);
 	}
