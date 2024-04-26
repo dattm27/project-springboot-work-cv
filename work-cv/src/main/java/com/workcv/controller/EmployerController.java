@@ -180,10 +180,10 @@ public class EmployerController {
 		Company company = companyService.getCompanyByUserId(user_id);
 		return ResponseEntity.ok().body(company);
 	}
-
+	// đã cop ra home controller 	
 	// Fetching the image of a particular company
 	@GetMapping("/profileImage/{user_id}")
-	public ResponseEntity<Resource> getProfileImage(@PathVariable int user_id) throws IOException {
+	public ResponseEntity<Resource> getProfileImage(@PathVariable("user_id") int user_id) throws IOException {
 		Company company = companyService.getCompanyByUserId(user_id);
 		// Get the image from the company object
 		Path imagePath = Paths.get(uploadDirectory, company.getLogo());

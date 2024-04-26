@@ -1,14 +1,26 @@
 package com.workcv.controller;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.workcv.model.Company;
+import com.workcv.service.CompanyService;
 import com.workcv.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +30,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class HomeController {
 	@Autowired
-    private UserService userService; // Đây là một interface/service xử lý logic liên quan đến người dùng
+    private CompanyService companyService;
+	@Autowired
+    private UserService userService;// Đây là một interface/service xử lý logic liên quan đến người dùng
 	@GetMapping("/")
 	public String showPage(HttpServletRequest request, Model model) {
 		// Lấy đối tượng Authentication từ SecurityContextHolder
@@ -64,6 +78,20 @@ public class HomeController {
         request.getSession().invalidate();
 		return  "logout" ;
 	}
+	// Fetching the image of a particular company
+		@GetMapping("/profileImage/{user_id}")
+		public ResponseEntity<Resource> getProfileImage(@PathVariable("user_id") int user_id) throws IOException {
+			Company company = companyService.getCompanyByUserId(user_id);
+			// Get the image from the company object
+			String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/employer";
+			Path imagePath = Paths.get(uploadDirectory, company.getLogo());
+			
+			// Fetching the image from that particular path
+			Resource resource = new FileSystemResource(imagePath.toFile());
+			;
+			String contentType = Files.probeContentType(imagePath);
+			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+		}
 	
 	
 }

@@ -1,5 +1,7 @@
 package com.workcv.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,17 @@ public class JobServiceImpl implements JobService {
 	public Job saveJob(Job job) {
 		// TODO Auto-generated method stub
 		return jobRepository.save(job);
+	}
+
+	@Override
+	public List<Job> getJobsOfCompany(int id) {
+		return jobRepository.findJobByCompanyId(id);
+	
+	}
+
+	@Override
+	public Job getJobById(int id) {
+		return jobRepository.findJobById(id);
 	}
 
 	

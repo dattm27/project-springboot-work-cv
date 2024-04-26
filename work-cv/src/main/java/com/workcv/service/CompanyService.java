@@ -29,5 +29,11 @@ public class CompanyService {
 		
 		
 	}
+
+
+	public Optional<Company> getCompanyById(int id) {
+		
+		return companyRepository.findById(id);
+	}
 	
 }
