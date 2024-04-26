@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -50,7 +51,7 @@ public class SecurityConfig {
 			auth.requestMatchers("/logout").permitAll();
 			auth.requestMatchers("/employer/**").hasAnyAuthority("employer");
 			auth.requestMatchers("/job/employer/**").hasAnyAuthority("employer");
-			auth.requestMatchers("/employer/profileImage").permitAll();
+			
 
 			auth.requestMatchers("/candidate.**").hasAnyAuthority("candidate");
 			auth.anyRequest().authenticated();

@@ -30,6 +30,12 @@ public class JobServiceImpl implements JobService {
 		return jobRepository.findJobById(id);
 	}
 
+	@Override
+	public void deleteJob(int jobId) {
+		jobRepository.deleteById(jobId);
+		
+	}
+
 	
 
 }

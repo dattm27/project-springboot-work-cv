@@ -15,12 +15,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.workcv.model.Company;
 import com.workcv.service.CompanyService;
+import com.workcv.service.JobService;
 import com.workcv.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +33,8 @@ import jakarta.servlet.http.HttpSession;
 public class HomeController {
 	@Autowired
     private CompanyService companyService;
+	@Autowired
+    private JobService jobService;
 	@Autowired
     private UserService userService;// Đây là một interface/service xử lý logic liên quan đến người dùng
 	@GetMapping("/")
@@ -92,6 +96,6 @@ public class HomeController {
 			String contentType = Files.probeContentType(imagePath);
 			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
 		}
-	
+		
 	
 }
