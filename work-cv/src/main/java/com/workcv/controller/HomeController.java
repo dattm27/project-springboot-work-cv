@@ -82,10 +82,10 @@ public class HomeController {
         request.getSession().invalidate();
 		return  "logout" ;
 	}
-	// Fetching the image of a particular company
-		@GetMapping("/profileImage/{user_id}")
-		public ResponseEntity<Resource> getProfileImage(@PathVariable("user_id") int user_id) throws IOException {
-			Company company = companyService.getCompanyByUserId(user_id);
+		// Fetching the image of a particular company
+		@GetMapping("/profileImage/{id}")
+		public ResponseEntity<Resource> getProfileImage(@PathVariable("id") int id) throws IOException {
+			Company company = companyService.getCompanyById(id).get();
 			// Get the image from the company object
 			String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/employer";
 			Path imagePath = Paths.get(uploadDirectory, company.getLogo());

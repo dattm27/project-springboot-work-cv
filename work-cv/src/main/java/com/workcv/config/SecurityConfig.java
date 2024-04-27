@@ -68,7 +68,11 @@ public class SecurityConfig {
 
 				).logout(logout -> logout.logoutUrl("/signout") // Endpoint cho việc đăng xuất
 						.logoutSuccessUrl("/") // URL sau khi đăng xuất thành công
-				);
+				).headers(headers -> headers
+				        .frameOptions(frameOptions -> frameOptions
+				                .sameOrigin() // Hoặc .disable() nếu bạn muốn vô hiệu hóa X-Frame-Options
+				            )
+				        );
 
 		return http.build();
 	};

@@ -36,6 +36,12 @@ public class JobServiceImpl implements JobService {
 		
 	}
 
+	@Override
+	public Job save(Job job) {
+		Job savedJob = jobRepository.save(job);
+		return savedJob;
+	}
+
 	
 
 }

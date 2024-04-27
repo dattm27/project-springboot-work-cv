@@ -5,13 +5,32 @@
 	<meta charset="UTF-8">
 	<title>Quản lý tuyển dụng - Work CV</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+	<link rel="stylesheet" href="/assets/css/pop-up.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 	<meta name="_csrf" th:content="${_csrf.token}" />
+	<script src="/assets/js/pop-up.js"></script>
 </head>
 
 <body>
 	<!--Thêm navbar -->
+	
 	<nav th:replace="fragments :: navbar"></nav>
+	<!--Pop up cập nhật thông tin công việc -->
+
+	<div id="popup" class="popup" style="display: none">
+		<div class="iframe-container">
+			<!-- nút đóng -->
+			<button type="button" class="btn btn-primary btn-circle close-icon" data-dismiss="modal"
+				onclick="hidePopup()">
+				<i class="fas fa-times"></i>
+			</button>
+			<!-- iframe để hiển thị trang khác trong pop up -->
+			<iframe id="popup-iframe" src="" width="100%" height="650px"></iframe>
+			<!--<div id="popup-iframe" src="" width="100%" height="650px"></div>-->
+
+		</div>
+	</div>
+	<!--Danh sách công vi-->
 	<div class="container">
 		<h3 class="mt-2">Danh sách công việc</h3>
 		<div>
@@ -37,7 +56,13 @@
 						<td th:text="${job.salary}" class="col-2"></td>
 						<td class="col-3">
 							<a th:href="@{/job/details/{jobId}(jobId=${job.id})}" class="btn btn-primary">Chi tiết</a>
-							<a href="#" class="btn btn-warning">Cập nhật</a>
+
+							<!--<a th:href="@{/job/employer/edit-jd/{jobId}(jobId=${job.id})}" class="btn btn-warning"
+								target="_blank">Cập nhật</a>-->
+							<button class="btn btn-warning" th:onclick="'showEditJobForm(' + ${job.id} + ')'">Cập
+								nhật</button>
+
+
 							<button class="btn btn-danger" th:onclick="'deleteJob(' + ${job.id} + ')'">Xoá</button>
 						</td>
 					</tr>
@@ -76,6 +101,39 @@
 						console.error('Lỗi khi xoá công việc:', error);
 					});
 			}
+		}
+
+		function showEditJobForm(jobId) {
+			var url = '/job/employer/edit-jd/' + jobId;
+
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+			// Tạo headers với X-CSRF-TOKEN
+			var headers = new Headers();
+			headers.append('X-CSRF-TOKEN', csrfToken);
+
+			fetch(url, {
+				method: 'GET',
+				headers: headers
+			})
+				.then(response => {
+					if (response.ok) {
+						return response.text();
+					}
+					throw new Error('Network response was not ok.');
+				})
+				.then(data => {
+					// Hiển thị kết quả trong popup
+					// Thiết lập src của iframe để hiển thị nội dung của trang cập nhật công việc
+					var iframe = document.querySelector('#popup-iframe');
+					iframe.srcdoc = data;
+
+					// Hiển thị popup
+					document.getElementById("popup").style.display = "block";
+				})
+				.catch(error => {
+					console.error('There has been a problem with your fetch operation:', error);
+				});
 		}
 
 	</script>

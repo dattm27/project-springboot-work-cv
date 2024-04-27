@@ -1,0 +1,49 @@
+@charset "UTF-8";
+.popup {
+   display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+ 
+
+   
+}
+
+.popup iframe {
+	
+    max-width: 80%; /* Điều chỉnh chiều rộng pop-up theo mong muốn */
+    height: 600px; /* Điều chỉnh chiều cao pop-up theo mong muốn */
+    border: none; /* Xóa viền iframe nếu không cần */
+    background-color: #fefefe;
+  	 border: 1px solid #888;
+	margin: 0 auto;
+	padding: 20px;
+	border: 1px solid #888;
+	position: relative;
+	left: 10%;
+	transform: translateY( 5%);
+	
+
+}
+
+
+.iframe-container {
+  position: relative;
+  z-index: 9999;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  /* Các thuộc tính khác cho kiểu hiển thị của biểu tượng đóng */
+}

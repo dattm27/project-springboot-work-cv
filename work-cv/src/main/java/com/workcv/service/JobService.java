@@ -10,4 +10,6 @@ public interface JobService {
 	List<Job> getJobsOfCompany(int id);
 	Job getJobById(int id);
 	void deleteJob(int jobId);
+	//dùng khi cập nhật thông tin jd
+	Job save(Job job);
 }

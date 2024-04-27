@@ -15,7 +15,10 @@
 
 <body>
 	<!--Thêm navbar -->
-	<nav th:replace="fragments :: navbar"></nav>
+	<div th:if="${command=='create'}">
+		<nav  th:replace="fragments :: navbar"></nav>
+	</div>
+	
 
 	<!--Form tạo job -->
 	<div class="container">
@@ -66,7 +69,7 @@
 			<div class="mb-3">
 				<label for="deadline" class="form-label">Hạn nộp hồ sơ:</label>
 				<input type="text" class="form-control datepicker" id="deadline" name="deadline" required
-					placeholder="dd/mm/yyyy">
+					placeholder="dd/mm/yyyy" th:value="${deadline}">
 			</div>
 
 
@@ -84,9 +87,11 @@
 					</option>
 				</select>
 			</div>
-
-			<div class="mb-3">
-				<button type="submit" class="btn btn-primary">Tạo Công Việc Mới</button>
+			<input type="hidden" name="command" th:value="${command}">
+			<input type="hidden" th:field="*{id}">
+ 			<div class="mb-3">
+				<button type="submit" class="btn btn-primary" th:if="${command=='create'}">Đăng bài</button>
+				<button type="submit" class="btn btn-success" th:unless="${command=='create'}">Cập nhật</button>
 			</div>
 	</div>
 	</form>
