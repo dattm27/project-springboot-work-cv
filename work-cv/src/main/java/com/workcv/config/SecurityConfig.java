@@ -47,10 +47,12 @@ public class SecurityConfig {
 
 			auth.requestMatchers("/user/signup").permitAll();
 			auth.requestMatchers("/assets/**").permitAll();
-			auth.requestMatchers("user/assets/**").permitAll();
+	
 			auth.requestMatchers("/logout").permitAll();
+			
 			auth.requestMatchers("/employer/**").hasAnyAuthority("employer");
 			auth.requestMatchers("/job/employer/**").hasAnyAuthority("employer");
+			auth.requestMatchers("/job/list").permitAll();
 			
 
 			auth.requestMatchers("/candidate.**").hasAnyAuthority("candidate");

@@ -43,5 +43,18 @@ public class JobServiceImpl implements JobService {
 	}
 
 	
+	@Override
+	public List<Job> getAvailableJobs() {
+		List<Job> jobs = jobRepository.findByStatusOrderByNumOfApplicantsDesc(1);
+		return jobs;
+	}
+
+	@Override
+	public List<Job> getTrendyJob() {
+		List<Job> trendyJobs = jobRepository.findFirst5ByStatusOrderByNumOfApplicantsDesc(1);
+		return trendyJobs;
+	}
+
+	
 
 }

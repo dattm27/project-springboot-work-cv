@@ -42,7 +42,8 @@ public class Job {
 
 	    @Column(name = "deadline")
 	    private Date deadline;
-
+	    @Column(name = "num_applicants")
+	    private int numOfApplicants = 0;
 	    @ManyToOne
 	    @JoinColumn(name = "category_id", referencedColumnName = "id")
 	    private Category category;
@@ -160,6 +161,14 @@ public class Job {
 
 		public void setCompany(Company company) {
 			this.company = company;
+		}
+
+		public int getNumOfApplicants() {
+			return numOfApplicants;
+		}
+
+		public void setNumOfApplicants(int numOfApplicants) {
+			this.numOfApplicants = numOfApplicants;
 		}
 		
 		

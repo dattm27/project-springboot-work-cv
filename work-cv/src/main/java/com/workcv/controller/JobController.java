@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -190,5 +191,11 @@ public class JobController {
 		model.addAttribute("job", job);
 		return "job-detail";
 	}
-
+	//Hiển thị danh sách toàn bộ công việc đang tuyển trong hệ thống
+	@GetMapping("/list")
+	public String showJobList( Model model) {
+		List<Job> jobs = jobService.getAvailableJobs();
+		model.addAttribute("jobs",jobs);
+		return "job-list";
+	}
 }

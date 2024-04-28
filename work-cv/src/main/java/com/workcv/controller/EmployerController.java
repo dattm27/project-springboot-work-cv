@@ -77,7 +77,7 @@ public class EmployerController {
 		String role = (String) currentUser.getRole();
 		model.addAttribute("username", username);
 		model.addAttribute("role", role);
-		return "employer-profile";
+		return "company-profile";
 	}
 
 	@PostMapping("/save-company")

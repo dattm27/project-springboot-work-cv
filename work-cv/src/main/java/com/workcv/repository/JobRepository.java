@@ -15,4 +15,9 @@ public interface JobRepository  extends JpaRepository<Job, Integer>{
 	Job save(Job job);
 
 	List<Job> findJobByCompanyId(int company_id);
+
+	List<Job> findByStatusOrderByViewDesc(int status);	
+	List<Job> findByStatusOrderByNumOfApplicantsDesc(int status);
+
+	List<Job> findFirst5ByStatusOrderByNumOfApplicantsDesc(int status);
 }

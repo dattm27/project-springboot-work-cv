@@ -12,4 +12,12 @@ public interface JobService {
 	void deleteJob(int jobId);
 	//dùng khi cập nhật thông tin jd
 	Job save(Job job);
+	
+	//Lấy tất cả các công việc còn đang tuyển
+	List<Job> getAvailableJobs();
+	
+	//Lấy top các công việc nổi bật
+	List<Job> getTrendyJob();
+	
+	
 }

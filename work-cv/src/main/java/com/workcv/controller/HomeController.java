@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.workcv.model.Company;
+import com.workcv.model.Job;
 import com.workcv.service.CompanyService;
 import com.workcv.service.JobService;
 import com.workcv.service.UserService;
@@ -61,6 +63,10 @@ public class HomeController {
 	        session.setAttribute("username", username);
 	        session.setAttribute("role", role);
 	    }
+	    
+	    //thêm các job nổi bật vào
+	    List<Job> trendyJobs = jobService.getTrendyJob();
+	    model.addAttribute("jobs", trendyJobs);
 		return "index";
 	}
 	@GetMapping("/candidate")
