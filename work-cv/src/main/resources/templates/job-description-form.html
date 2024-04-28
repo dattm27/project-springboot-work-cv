@@ -71,7 +71,7 @@
 				<input type="text" class="form-control datepicker" id="deadline" name="deadline" required
 					placeholder="dd/mm/yyyy" th:value="${deadline}">
 			</div>
-
+			
 
 			<div class="mb-3">
 				<label for="description" class="form-label">Mô tả công việc:</label>
@@ -87,6 +87,13 @@
 					</option>
 				</select>
 			</div>
+			<div class="mb-3">
+				<label for="status" class="form-label">Trạng thái:</label>
+				<select class="form-select" id="status" name="status" th:field="*{status}">
+					<option value="1">Nhận ứng viên</option>
+					<option value="0">Dừng nhận ứng viên</option>
+				</select>
+			 </div>
 			<input type="hidden" name="command" th:value="${command}">
 			<input type="hidden" th:field="*{id}">
  			<div class="mb-3">

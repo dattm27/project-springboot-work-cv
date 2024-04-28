@@ -57,7 +57,7 @@ public class JobController {
 		return "job-description-form";
 	}
 
-	// lưu job mới
+	// lưu job (thêm job mới + cập nhật job cũ)
 	@PostMapping("/employer/save-job")
 	public String processCreateJob(@ModelAttribute("job") Job job, RedirectAttributes redirectAttributes,
 			@RequestParam("deadline") String deadlineString, @RequestParam("command") String command) {
@@ -186,6 +186,10 @@ public class JobController {
 //		model.addAttribute("username", currentUser.getFullName());
 //		model.addAttribute("role", currentUser.getRole());
 		Job job = jobService.getJobById(id);
+		//tăng view
+		int view = job.getView();
+		job.setView(view+1);
+		jobService.save(job);
 		Optional<Company> company = companyService.getCompanyById(job.getCompany().getId());
 		model.addAttribute("company", company.get());
 		model.addAttribute("job", job);
