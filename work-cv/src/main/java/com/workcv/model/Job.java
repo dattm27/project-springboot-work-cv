@@ -51,6 +51,8 @@ public class Job {
 	    @JoinColumn(name = "company_id")
 	    private Company company;
 	    
+	 
+	    
 		public int getId() {
 			return id;
 		}

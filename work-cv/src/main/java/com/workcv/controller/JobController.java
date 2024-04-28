@@ -181,10 +181,10 @@ public class JobController {
 
 	@GetMapping("/details/{id}")
 	public String showDetailJd(Model model, @PathVariable("id") int id) {
-		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
-		model.addAttribute("username", currentUser.getFullName());
-		model.addAttribute("role", currentUser.getRole());
+//		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+//				.getPrincipal();
+//		model.addAttribute("username", currentUser.getFullName());
+//		model.addAttribute("role", currentUser.getRole());
 		Job job = jobService.getJobById(id);
 		Optional<Company> company = companyService.getCompanyById(job.getCompany().getId());
 		model.addAttribute("company", company.get());

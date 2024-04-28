@@ -91,6 +91,7 @@ public class UserController {
 		model.addAttribute("user", user);
 		model.addAttribute("username", user.getFullName());
 		model.addAttribute("role", user.getRole());
+		if (user.getCv()!= null) model.addAttribute("cv", user.getCv());
 		return "profile";
 	}
 
@@ -134,6 +135,7 @@ public class UserController {
 		user.setFullName(updatedUser.getFullName());
 		user.setDescription(updatedUser.getDescription());
 		user.setPhoneNumber(updatedUser.getPhoneNumber());
+		redirectAttributes.addFlashAttribute("msg", "Cập nhật thông tin cá nhân thành công");
 		//Lưu thông tin người dùng mới cập nhật vào cơ sở dữ liệu
 		userService.save(user);
 		return "redirect:/user/profile";

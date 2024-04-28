@@ -1,12 +1,12 @@
-package com.workcv.model;
+package com.workcv.service;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.workcv.model.Category;
 import com.workcv.repository.CategoryRepository;
-import com.workcv.service.CategoryService;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 	@Autowired

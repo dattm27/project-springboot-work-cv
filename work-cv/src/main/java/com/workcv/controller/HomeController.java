@@ -50,6 +50,8 @@ public class HomeController {
 	        String username = userService.getFullnameByEmail(authentication.getName());
 	        //lấy vai trò người dùng để hiển thị các chức năng tương ứng
 	        String role = userService.getRoleByEmail(authentication.getName());
+	        //lấy id người dùng để hiển thị các chức năng tương ứng
+	       
 	        //chỉ cần chọn một trong hai cách để truyền đi username password
 	        //thêm vào model các thuộc tính tên người dùng và vai trò
 	        
@@ -62,6 +64,7 @@ public class HomeController {
 	        HttpSession session = request.getSession();
 	        session.setAttribute("username", username);
 	        session.setAttribute("role", role);
+	    
 	    }
 	    
 	    //thêm các job nổi bật vào
