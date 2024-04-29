@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.workcv.model.Apply;
 import com.workcv.model.ApplyInfo;
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
@@ -204,7 +205,8 @@ public class EmployerController {
 		String contentType = Files.probeContentType(imagePath);
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
 	}
-	//lấy danh sách các ứng viên của công ty mình
+
+	// lấy danh sách các ứng viên của công ty mình
 	@GetMapping("/applicants-list")
 	public String showApplications(Model model) throws IOException {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
@@ -223,7 +225,7 @@ public class EmployerController {
 			}
 			System.out.println();
 		}
-	
+
 		List<User> users = userService.getAllUsers();
 		model.addAttribute("users", users);
 
@@ -231,17 +233,38 @@ public class EmployerController {
 
 		return "manage-applications"; // Thay thế bằng tên view của bạn
 	}
-	
-	//Nạp file CV của ứng viên lên
-		@GetMapping("cv/{id}")
-		public ResponseEntity<Resource> getCV(@PathVariable("id") int id) throws IOException {
-			String filename = cvService.getCVById(id).get().getFilename();
-			//Get the cv from user
-			Path cvPath = Paths.get( System.getProperty("user.dir") + "/src/main/webapp/cv", filename);
-			//Fetching the image from that particular path
-			Resource resource = new FileSystemResource(cvPath.toFile());
-			String contentType = Files.probeContentType(cvPath);
-			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
-		}
 
+	// Nạp file CV của ứng viên lên
+	@GetMapping("cv/{id}")
+	public ResponseEntity<Resource> getCV(@PathVariable("id") int id) throws IOException {
+		String filename = cvService.getCVById(id).get().getFilename();
+		// Get the cv from user
+		Path cvPath = Paths.get(System.getProperty("user.dir") + "/src/main/webapp/cv", filename);
+		// Fetching the image from that particular path
+		Resource resource = new FileSystemResource(cvPath.toFile());
+		String contentType = Files.probeContentType(cvPath);
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+	}
+
+//	duyệt ứng viên
+	@PostMapping("accept/{apply_id}")
+	public String acceptApplicant(@PathVariable("apply_id") int id, RedirectAttributes redirectAttributes)
+			throws IOException {
+		Apply apply = applyService.getApplyById(id).get();
+		apply.setStatus("Đã duyệt");
+		applyService.save(apply);
+
+		return "redirect:/employer/applicants-list";
+	}
+
+//	duyệt ứng viên
+	@PostMapping("decline/{apply_id}")
+	public String declineApplicant(@PathVariable("apply_id") int id, RedirectAttributes redirectAttributes)
+			throws IOException {
+		Apply apply = applyService.getApplyById(id).get();
+		apply.setStatus("Đã từ chối");
+		applyService.save(apply);
+
+		return "redirect:/employer/applicants-list";
+	}
 }

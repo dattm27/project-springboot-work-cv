@@ -1,6 +1,7 @@
 package com.workcv.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,11 @@ public class ApplyServiceImpl implements ApplyService {
 	public List<Object[]> getApplicationDetailsByCompanyId(int companyId) {
 		
 		 return applyRepository.findApplicationDetailsByCompanyId(companyId);
+	}
+	@Override
+	public Optional<Apply> getApplyById(int id) {
+		Optional<Apply> apply = applyRepository.findById(id);
+		return apply;
 	}
 
 }

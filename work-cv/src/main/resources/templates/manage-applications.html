@@ -13,48 +13,106 @@
 
 	<!--Thêm navbar -->
 	<nav th:replace="fragments :: navbar"></nav>
-	 <div class="container">
-        <h1>Danh sách ứng viên</h1>
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Họ và tên</th>
-                        <th>Email</th>
-                        <th>Vị trí ứng tuyển	</th>
-                        <th>CV </th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Loop through the list of applicants -->
-                    <div th:each="applicant : ${applications}">
-                        <tr>
-                            <td th:text="${applicant[0]}">Tên</td>
-                            <td th:text="${applicant[1]}">Email</td>
-                            <td th:text="${applicant[2]}">Vị trí công việc</td>
-                            <td><a th:href="@{cv/{id}(id =${applicant[3]})}"  target="_blank"> Xem</a></td>
-                            <td th:text="${applicant[4]}"></td>
-                            <td >
-							<a  class="btn btn-primary">Chi tiết</a>
+	<div class="container">
+		<h1>Danh sách ứng viên</h1>
+		<div class="table-responsive">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Họ và tên</th>
+						<th>Email</th>
+						<th>Vị trí ứng tuyển </th>
+						<th>CV </th>
+						<th>Trạng thái</th>
+						<th>Hành động</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- Loop through the list of applicants -->
+					<div th:each="applicant : ${applications}">
+						<tr>
+							<td th:text="${applicant[0]}">Tên</td>
+							<td th:text="${applicant[1]}">Email</td>
+							<td th:text="${applicant[2]}">Vị trí công việc</td>
+							<td><a th:href="@{cv/{id}(id =${applicant[3]})}" target="_blank"> Xem</a></td>
+							<td>
+								<span th:text="${applicant[4]}" th:classappend="${applicant[4] == 'Chờ xét duyệt' ? 'text-warning' : 
+                         applicant[4] == 'Đã duyệt' ? 'text-success' : 
+                         applicant[4] == 'Đã từ chối' ? 'text-danger' : ''}">Trạng thái</span>
+							</td>
+							<td>
+								<a class="btn btn-primary">Chi tiết</a>
 
-							<!--<a th:href="@{/job/employer/edit-jd/{jobId}(jobId=${job.id})}" class="btn btn-warning"
-								target="_blank">Cập nhật</a>-->
-							<button class="btn btn-warning">Cập
-								nhật</button>
+								<button class="btn btn-success"
+									th:unless="${applicant[4]=='Đã duyệt' || applicant[4] == 'Đã từ chối'}" th:onclick="'acceptApplicant(' + ${applicant[5]} +')'">Duyệt</button>
 
 
-							<button class="btn btn-danger" >Xoá</button>
-						</td>
-                        </tr>
-                     
-                    </div>
-                </tbody>
-            </table>
-        </div>
-    </div>
-	
+								<button th:unless="${applicant[4]=='Đã duyệt' || applicant[4] == 'Đã từ chối' }" th:onclick="'declineApplicant(' + ${applicant[5]} +')'" class="btn btn-danger">Từ chối</button>
+							</td>
+						</tr>
+
+					</div>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<script>
+		<!--Xử lý yêu cầu duyệt một ứng viên-->
+		function acceptApplicant(id) {
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+			if (confirm("Bạn có chắc muốn xác nhận ứng viên?")) {
+				// Gửi yêu cầu DELETE đến server
+				fetch('accept/' + id, {
+					method: 'POST',
+					headers: {
+						'X-CSRF-TOKEN': csrfToken
+					}
+				})
+					.then(response => {
+						if (response.ok) {
+							//Duyệt thành công, có thể cập nhật giao diện nếu cần
+							// Ví dụ: reload danh sách ứng viên
+							
+							location.reload();
+						} else {
+							// Xử lý khi có lỗi chấp nhận ứng viên
+							console.error('Chấp nhận ứng viên thất bại');
+						}
+					})
+					.catch(error => {
+						console.error('Lỗi khi chấp nhận ứng viên:', error);
+					});
+			}
+		}
+		//Từ chối ứng viên
+		function declineApplicant(id) {
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+			if (confirm("Bạn có chắc muốn xác nhận ứng viên?")) {
+				// Gửi yêu cầu DELETE đến server
+				fetch('decline/' + id, {
+					method: 'POST',
+					headers: {
+						'X-CSRF-TOKEN': csrfToken
+					}
+				})
+					.then(response => {
+						if (response.ok) {
+							//Từ chối, có thể cập nhật giao diện nếu cần
+							// Ví dụ: reload danh sách ứng viên
+						
+							location.reload();
+						} else {
+								alert("Từ chối ứng viên thất bại");
+							// Xử lý khi có lỗi từ chối  ứng viên
+							console.error('Từ chối ứng viên thất bại');
+						}
+					})
+					.catch(error => {
+						console.error('Lỗi khi từ chối ứng viên:', error);
+					});
+			}
+		}
+	</script>
 </body>
 
 </html>

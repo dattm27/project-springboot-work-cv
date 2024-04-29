@@ -14,7 +14,7 @@ public interface ApplyRepository  extends JpaRepository<Apply, Integer>{
 
 	Apply findByUserIdAndJobId(int user_id, int job_id);
 	
-	  @Query("SELECT u.fullName, u.email, j.title, a.cv.id, a.status " +
+	  @Query("SELECT u.fullName, u.email, j.title, a.cv.id, a.status, a.id " +
 	           "FROM User u " +
 	           "JOIN Apply a ON u.id = a.user.id " +
 	           "JOIN Job j ON a.job.id = j.id " +
