@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,10 +26,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.workcv.model.ApplyInfo;
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
 import com.workcv.model.Job;
+import com.workcv.model.User;
+import com.workcv.service.ApplyService;
 import com.workcv.service.CompanyService;
+import com.workcv.service.CvService;
 import com.workcv.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +46,10 @@ public class EmployerController {
 	private CompanyService companyService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private ApplyService applyService;
+	@Autowired
+	private CvService cvService;
 	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/employer";
 
 	@GetMapping("/company-profile")
@@ -180,7 +189,8 @@ public class EmployerController {
 		Company company = companyService.getCompanyByUserId(user_id);
 		return ResponseEntity.ok().body(company);
 	}
-	// đã cop ra home controller 	
+
+	// đã cop ra home controller
 	// Fetching the image of a particular company
 	@GetMapping("/profileImage/{user_id}")
 	public ResponseEntity<Resource> getProfileImage(@PathVariable("user_id") int user_id) throws IOException {
@@ -194,7 +204,44 @@ public class EmployerController {
 		String contentType = Files.probeContentType(imagePath);
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
 	}
+	//lấy danh sách các ứng viên của công ty mình
+	@GetMapping("/applicants-list")
+	public String showApplications(Model model) throws IOException {
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		model.addAttribute("username", currentUser.getFullName());
+		model.addAttribute("role", currentUser.getRole());
+		int companyId = currentUser.getUser().getCompany().getId();
+		System.out.print("Danh sách ứng viên " + companyId);
 
+		List<Object[]> applicationDetails = applyService.getApplicationDetailsByCompanyId(companyId);
+
+		// In ra thông tin applicationDetails
+		for (Object[] details : applicationDetails) {
+			for (Object detail : details) {
+				System.out.print(detail + " ");
+			}
+			System.out.println();
+		}
 	
+		List<User> users = userService.getAllUsers();
+		model.addAttribute("users", users);
+
+		model.addAttribute("applications", applicationDetails);
+
+		return "manage-applications"; // Thay thế bằng tên view của bạn
+	}
+	
+	//Nạp file CV của ứng viên lên
+		@GetMapping("cv/{id}")
+		public ResponseEntity<Resource> getCV(@PathVariable("id") int id) throws IOException {
+			String filename = cvService.getCVById(id).get().getFilename();
+			//Get the cv from user
+			Path cvPath = Paths.get( System.getProperty("user.dir") + "/src/main/webapp/cv", filename);
+			//Fetching the image from that particular path
+			Resource resource = new FileSystemResource(cvPath.toFile());
+			String contentType = Files.probeContentType(cvPath);
+			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+		}
 
 }

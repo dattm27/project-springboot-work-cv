@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Quản lý ứng viên</title>
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<div th:replace="fragments :: css"></div>
+
+</head>
+
+<body>
+
+	<!--Thêm navbar -->
+	<nav th:replace="fragments :: navbar"></nav>
+	 <div class="container">
+        <h1>Danh sách ứng viên</h1>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Họ và tên</th>
+                        <th>Email</th>
+                        <th>Vị trí ứng tuyển	</th>
+                        <th>CV </th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loop through the list of applicants -->
+                    <div th:each="applicant : ${applications}">
+                        <tr>
+                            <td th:text="${applicant[0]}">Tên</td>
+                            <td th:text="${applicant[1]}">Email</td>
+                            <td th:text="${applicant[2]}">Vị trí công việc</td>
+                            <td><a th:href="@{cv/{id}(id =${applicant[3]})}"  target="_blank"> Xem</a></td>
+                            <td th:text="${applicant[4]}"></td>
+                            <td >
+							<a  class="btn btn-primary">Chi tiết</a>
+
+							<!--<a th:href="@{/job/employer/edit-jd/{jobId}(jobId=${job.id})}" class="btn btn-warning"
+								target="_blank">Cập nhật</a>-->
+							<button class="btn btn-warning">Cập
+								nhật</button>
+
+
+							<button class="btn btn-danger" >Xoá</button>
+						</td>
+                        </tr>
+                     
+                    </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+	
+</body>
+
+</html>

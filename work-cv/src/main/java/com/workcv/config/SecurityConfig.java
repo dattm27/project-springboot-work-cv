@@ -58,6 +58,7 @@ public class SecurityConfig {
 			
 			auth.requestMatchers("/job/list").permitAll();
 			auth.requestMatchers("/candidate.**").hasAnyAuthority("candidate");
+			auth.requestMatchers("/candidate/cv/**").hasAnyAuthority("employer");
 			auth.anyRequest().authenticated();
 			
 
