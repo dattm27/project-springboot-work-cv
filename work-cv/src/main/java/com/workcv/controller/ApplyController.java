@@ -63,6 +63,11 @@ public class ApplyController {
 			apply.setCv(cv);
 			
 		}
+		else {
+			CV cv = currentUser.getUser().getCv();
+			apply.setCv(cv);
+		}
+		
 		applyService.save(apply);
 		redirectAttributes.addAttribute("username", currentUser.getFullName());
 		redirectAttributes.addAttribute("role", currentUser.getRole());
