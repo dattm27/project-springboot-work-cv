@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -52,7 +53,7 @@ public class JobController {
 		model.addAttribute("job", job);
 		model.addAttribute("username", currentUser.getFullName());
 		model.addAttribute("role", currentUser.getRole());
-		//thêm lệnh cho biết đây là tạo mới job -> phân biệt với update
+		// thêm lệnh cho biết đây là tạo mới job -> phân biệt với update
 		model.addAttribute("command", "create");
 		return "job-description-form";
 	}
@@ -63,14 +64,12 @@ public class JobController {
 			@RequestParam("deadline") String deadlineString, @RequestParam("command") String command) {
 		// Định dạng ngày tháng "dd/MM/yyyy"
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		//đây là khi form gửi tới là tạo mới job
+		// đây là khi form gửi tới là tạo mới job
 		if (command.equalsIgnoreCase("create")) {
 			// Lấy ngày hiện tại
 			Date currentDate = new Date();
 			// Gán đối tượng Timestamp vào trường createdDate
 			job.setCreatedDate(currentDate);
-			
-			
 
 			try {
 				// Chuyển đổi chuỗi ngày thành đối tượng Date
@@ -97,27 +96,27 @@ public class JobController {
 				return "redirect:/job/employer/create-job";
 			}
 		}
-		//khi form gửi tới là form cập nhật
+		// khi form gửi tới là form cập nhật
 		if (command.equalsIgnoreCase("update")) {
 			Date deadline;
-			//lấy đối tượng job cũ dể cập nhật
+			// lấy đối tượng job cũ dể cập nhật
 			System.out.print(job.getId());
 			Job oldJob = jobService.getJobById(job.getId());
-		
+
 			try {
-				
+
 				deadline = formatter.parse(deadlineString);
-				//đặt deadline mới cho job
+				// đặt deadline mới cho job
 				oldJob.setDeadline(deadline);
-				
+
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				// Gán ngày tháng vào trường deadline của job
 
 			}
-			
-			//cập nhật các giá trị mới cho job
+
+			// cập nhật các giá trị mới cho job
 			oldJob.setAddress(job.getAddress());
 			oldJob.setDescription(job.getDescription());
 			oldJob.setExperience(job.getExperience());
@@ -125,13 +124,13 @@ public class JobController {
 			oldJob.setCategory(job.getCategory());
 			oldJob.setQuantity(job.getQuantity());
 			oldJob.setStatus(job.getStatus());
-			
-			//lưu lại thông tin
+
+			// lưu lại thông tin
 			jobService.save(oldJob);
-			
+
 		}
 		redirectAttributes.addFlashAttribute("saveJobSuccess", true);
-		return "redirect:/job/employer/edit-jd/"+job.getId();
+		return "redirect:/job/employer/edit-jd/" + job.getId();
 
 	}
 
@@ -143,7 +142,7 @@ public class JobController {
 		model.addAttribute("username", currentUser.getFullName());
 		model.addAttribute("role", currentUser.getRole());
 		// lấy danh sách các job của một công ty
-		List<Job> jobs = jobService.getJobsOfCompany(companyService.getCompanyByUserId(currentUser.getId()).getId());
+		List<Job> jobs = jobService.getJobsOfCompany(currentUser.getUser().getCompany().getId());
 		model.addAttribute("jobs", jobs);
 		return "manage-job";
 	}
@@ -166,7 +165,7 @@ public class JobController {
 		// Lấy danh sách danh mục từ cơ sở dữ liệu và truyền vào form
 		List<Category> categories = categoryService.getAllCategories();
 		model.addAttribute("categories", categories);
-		//Thêm lệnh cho biết form này là form cập nhật
+		// Thêm lệnh cho biết form này là form cập nhật
 		model.addAttribute("command", "update");
 		return "job-description-form";
 	}
@@ -181,25 +180,30 @@ public class JobController {
 
 	@GetMapping("/details/{id}")
 	public String showDetailJd(Model model, @PathVariable("id") int id) {
-//		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
-//				.getPrincipal();
-//		model.addAttribute("username", currentUser.getFullName());
-//		model.addAttribute("role", currentUser.getRole());
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		model.addAttribute("username", currentUser.getFullName());
+		model.addAttribute("role", currentUser.getRole());
 		Job job = jobService.getJobById(id);
-		//tăng view
+		// tăng view
 		int view = job.getView();
-		job.setView(view+1);
+		job.setView(view + 1);
 		jobService.save(job);
 		Optional<Company> company = companyService.getCompanyById(job.getCompany().getId());
 		model.addAttribute("company", company.get());
 		model.addAttribute("job", job);
 		return "job-detail";
 	}
-	//Hiển thị danh sách toàn bộ công việc đang tuyển trong hệ thống
+
+	// Hiển thị danh sách toàn bộ công việc đang tuyển trong hệ thống
 	@GetMapping("/list")
-	public String showJobList( Model model) {
+	public String showJobList(Model model) {
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		model.addAttribute("role", currentUser.getRole());
+		model.addAttribute("username", currentUser.getFullName());
 		List<Job> jobs = jobService.getAvailableJobs();
-		model.addAttribute("jobs",jobs);
+		model.addAttribute("jobs", jobs);
 		return "job-list";
 	}
 }

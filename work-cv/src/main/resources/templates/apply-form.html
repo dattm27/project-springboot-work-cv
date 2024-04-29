@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<form th:action="@{/apply/save-apply/{id}(id = ${id})}" method="post" enctype="multipart/form-data">
+	<!-- Select CV Type -->
+	<div class="form-group">
+		<label for="cvType">Loại CV</label>
+		<select class="form-control" id="cvType" onchange="toggleUpload(this)">
+			<option th:if="${cv}" th:text="${cv.filename}" value="existing">Chọn CV hiện có</option>
+			<option value="new">Tạo CV mới</option>
+		</select>
+	</div>
+
+	<!-- Upload New CV -->
+	<div class="form-group" id="uploadCV" style="display: none;">
+		<label for="newCV">Tải lên CV mới</label>
+		<input type="file" class="form-control-file" id="newCV" name="cv">
+	</div>
+
+	<!-- Introduction Text Area -->
+	<div class="form-group">
+		<label for="introduction">Giới thiệu bản thân</label>
+		<textarea class="form-control" id="introduction" name="note" rows="3"></textarea>
+	</div>
+
+	<!-- Submit Button -->
+	<button type="submit" class="btn btn-primary">Gửi Ứng tuyển</button>
+</form>
+ <script>
+        function toggleUpload(selectElement) {
+            var uploadDiv = document.getElementById("uploadCV");
+            if (selectElement.value === "new") {
+                uploadDiv.style.display = "block";
+            } else {
+                uploadDiv.style.display = "none";
+            }
+        }
+    </script>
+</html>

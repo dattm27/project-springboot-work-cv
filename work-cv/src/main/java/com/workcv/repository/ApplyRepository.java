@@ -7,4 +7,7 @@ import com.workcv.model.Apply;
 @Repository
 public interface ApplyRepository  extends JpaRepository<Apply, Integer>{
 
+	Apply findByUserIdAndJobId(int user_id, int job_id);
+	
+
 }

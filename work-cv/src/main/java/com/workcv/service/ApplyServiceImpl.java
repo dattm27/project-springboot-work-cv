@@ -16,5 +16,10 @@ public class ApplyServiceImpl implements ApplyService {
 		Apply savedApply = applyRepository.save(apply);
 		return savedApply;
 	}
+	@Override
+	public Apply getApply(int user_id, int job_id) {
+		Apply apply = applyRepository.findByUserIdAndJobId(user_id, job_id);
+		return apply;
+	}
 
 }

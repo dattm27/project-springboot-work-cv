@@ -15,7 +15,7 @@ public class CV {
 	@JoinColumn(name = "user_id",  referencedColumnName = "id")
 	private User user;
 
-
+	
 
 	// Getters and setters
 
@@ -42,5 +42,7 @@ public class CV {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+
 
 }

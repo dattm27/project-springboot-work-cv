@@ -36,8 +36,10 @@ public class User {
 	@Column
 	private String role;
 	@OneToOne(mappedBy = "user")
-	
 	private CV cv;
+	@OneToOne(mappedBy = "user")
+	
+	private Company company;
 
 	public int getId() {
 		return id;
@@ -125,6 +127,14 @@ public class User {
 
 	public void setCv(CV cv) {
 		this.cv = cv;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 
 

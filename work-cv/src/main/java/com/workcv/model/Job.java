@@ -43,7 +43,7 @@ public class Job {
 	    @Column(name = "deadline")
 	    private Date deadline;
 	    @Column(name = "num_applicants")
-	    private int numOfApplicants = 0;
+	    private int numOfApplicants ;
 	    @ManyToOne
 	    @JoinColumn(name = "category_id", referencedColumnName = "id")
 	    private Category category;

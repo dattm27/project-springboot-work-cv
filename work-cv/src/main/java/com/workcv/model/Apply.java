@@ -29,9 +29,10 @@ public class Apply {
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
     
-    @Column(name = "cv")
-    private String cv;
-
+    @OneToOne
+	@JoinColumn(name = "cv_id",  referencedColumnName = "id")
+	private CV cv;
+    
 	public int getId() {
 		return id;
 	}
@@ -80,13 +81,14 @@ public class Apply {
 		this.note = note;
 	}
 
-	public String getCv() {
+	public CV getCv() {
 		return cv;
 	}
 
-	public void setCv(String cv) {
+	public void setCv(CV cv) {
 		this.cv = cv;
 	}
+
 
     
 }

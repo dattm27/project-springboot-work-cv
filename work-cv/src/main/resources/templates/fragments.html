@@ -117,13 +117,12 @@
 	<link rel="stylesheet" href="/assets/css/ionicons.min.css">
 	<link rel="stylesheet" href="/assets/css/bootstrap-datepicker.css">
 	<link rel="stylesheet" href="/assets/css/jquery.timepicker.css">
-	<link rel="stylesheet" href="/assets/css/css/bootstrap-reboot.css">
+	
 	<link rel="stylesheet" href="/assets/css/css/mixins/_text-hide.css">
 	<link rel="stylesheet" href="/assets/css/flaticon.css">
 	<link rel="stylesheet" href="/assets/css/icomoon.css">
-	<link rel="stylesheet" href="/assets/css/style.css">
-	<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap-grid.css">
-	<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap-reboot.css">
+	
+	
 
 
 	<!-- JS -->
@@ -145,6 +144,27 @@
 	<script src="/assets/js/main.js"></script>
 	<script src="https://cdn.ckeditor.com/ckeditor5/29.0.0/classic/ckeditor.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="/assets/js/modal.js"></script>
+</div>
+<div th:fragment="modal">
+<!-- Modal hiển thị form ứng tuyển -->
+<div class="modal fade"  id="resultModal" tabindex="-1" role="dialog" aria-labelledby="applyModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog " role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="applyModalLabel">Form Ứng tuyển</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="hideModal()">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!--Để trống mody để chèn nội dung form ứng tuyển nếu chưa ứng tuyển-->
+			</div>
+		</div>
+	</div>
+</div>
+	
 </div>
 
 </html>

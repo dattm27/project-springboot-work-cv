@@ -48,7 +48,6 @@ public class SecurityConfig {
 			auth.requestMatchers("/user/signup").permitAll();
 			auth.requestMatchers("/assets/**").permitAll();
 	
-			auth.requestMatchers("/logout").permitAll();
 			
 			auth.requestMatchers("/employer/**").hasAnyAuthority("employer");
 			auth.requestMatchers("/job/employer/**").hasAnyAuthority("employer");
@@ -57,9 +56,10 @@ public class SecurityConfig {
 		
 			auth.requestMatchers("/profileImage/**").permitAll();
 			
-
+			auth.requestMatchers("/job/list").permitAll();
 			auth.requestMatchers("/candidate.**").hasAnyAuthority("candidate");
 			auth.anyRequest().authenticated();
+			
 
 		})
 //		.formLogin(withDefaults());

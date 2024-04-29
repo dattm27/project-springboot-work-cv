@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Báo lỗi</title>
+<div th:replace="fragments :: css"></div>
+
+</head>
+<body>
+<div class="alert alert-danger" role="alert" th:text="${error}">
+  A simple danger alert—check it out!
+</div>
+</body>
+</html>

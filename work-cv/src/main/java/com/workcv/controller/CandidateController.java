@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,9 +22,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.core.io.FileSystemResource;
 
+import com.workcv.model.Apply;
 import com.workcv.model.CV;
 import com.workcv.model.CustomUserDetails;
 import com.workcv.model.User;
+import com.workcv.service.ApplyService;
 import com.workcv.service.CvService;
 import com.workcv.service.UserService;
 
@@ -32,8 +35,11 @@ import com.workcv.service.UserService;
 public class CandidateController {
 	@Autowired
 	private UserService userService;
+	
 	@Autowired
 	private CvService cvService;
+	@Autowired
+	private ApplyService applyService;
 
 	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/cv";
 
@@ -69,6 +75,8 @@ public class CandidateController {
 			cv.setUser(user);
 			
 			cvService.save(cv);
+			currentUser.getUser().setCv(cv);
+			
 		}
 
 		redirectAttributes.addFlashAttribute("msg", "Cập nhật CV thành công");
@@ -86,5 +94,24 @@ public class CandidateController {
 		Resource resource = new FileSystemResource(cvPath.toFile());
 		String contentType = Files.probeContentType(cvPath);
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+	}
+	
+	@GetMapping("/apply/{id}")
+	public String getApplyForm(@PathVariable("id") int id, Model model) {
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		Apply applied= applyService.getApply( currentUser.getId(), id);
+		
+		if (applied == null) {
+			model.addAttribute("id", id);
+			CV cv = currentUser.getUser().getCv();
+			model.addAttribute("cv", cv);
+			return "apply-form";
+		}
+		else {
+			model.addAttribute("error", "Bạn đã ứng tuyển công việc này");
+			return "error";
+		}
+		
 	}
 }
