@@ -216,8 +216,11 @@ public class JobController {
 		List<Job> jobs = jobService.getAvailableJobs();
 		//thêm list danh mục nổi bật (có nhiều jobs)
 		List<Object[]> categories = categoryService.getTrendyCategories();
+		//them list cong ty noi bat
+		List<Object[]> companies = companyService.getTopCompanies();
 		model.addAttribute("jobs", jobs);
 		model.addAttribute("categories", categories);
+		model.addAttribute("companies", companies);
 		return "job-list";
 	}
 }

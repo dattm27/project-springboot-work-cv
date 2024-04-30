@@ -71,10 +71,13 @@ public class EmployerController {
 		Company existingCompany = getCompanyByUserId(userId).getBody();
 		if (existingCompany != null) { // nếu đã có thông tin công ty rồi
 			model.addAttribute("company", existingCompany);
-			Resource imageResource = getProfileImage(userId).getBody();
-			// Thêm hình ảnh vào model
-
-			model.addAttribute("imageResource", imageResource);
+			//nếu công ty có sẵn ảnh 
+			if(existingCompany.getLogo()!= null) {
+				Resource imageResource = getProfileImage(userId).getBody();
+				
+				 model.addAttribute("imageResource", imageResource);
+			}
+			
 		} else {// nếu chưa tạo thông tin công ty
 			// tạo đối tượng company mới
 			Company company = new Company();

@@ -76,6 +76,9 @@ public class HomeController {
 	    model.addAttribute("jobs", trendyJobs);
 	  //thêm list danh mục nổi bật (có nhiều jobs)
 	  	List<Object[]> categories = categoryService.getTrendyCategories();
+	  	//top cong ty noi bat
+	  	List<Object[]> companies = companyService.getTopCompanies();
+		model.addAttribute("companies", companies);
 	  	model.addAttribute("categories", categories);
 		return "index";
 	}

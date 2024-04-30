@@ -1,5 +1,6 @@
 package com.workcv.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,4 +37,8 @@ public class CompanyService {
 		return companyRepository.findById(id);
 	}
 	
+	public List<Object[]> getTopCompanies() {
+		List<Object[]> topCompanies = companyRepository.findTopCompaniesByNumJobs();
+		return topCompanies;
+	}
 }
