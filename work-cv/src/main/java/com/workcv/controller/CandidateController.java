@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -25,9 +26,11 @@ import org.springframework.core.io.FileSystemResource;
 import com.workcv.model.Apply;
 import com.workcv.model.CV;
 import com.workcv.model.CustomUserDetails;
+import com.workcv.model.SavedJob;
 import com.workcv.model.User;
 import com.workcv.service.ApplyService;
 import com.workcv.service.CvService;
+import com.workcv.service.JobService;
 import com.workcv.service.UserService;
 
 @Controller
@@ -40,6 +43,8 @@ public class CandidateController {
 	private CvService cvService;
 	@Autowired
 	private ApplyService applyService;
+	@Autowired
+	private JobService jobService;
 
 	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/cv";
 
@@ -114,4 +119,37 @@ public class CandidateController {
 		}
 		
 	}
+	
+	@PostMapping("/saveJob/{id}")
+    @ResponseBody
+    public String saveJob(@PathVariable("id") int id) {
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		// Xử lý lưu công việc ở đây
+        SavedJob savedJob = userService.saveJob(currentUser.getUser(), jobService.getJobById(id));
+        currentUser.getUser().getSavedJobs().add(savedJob);
+        // Trả về phản hồi
+        return "Job saved successfully";
+    }
+	@PostMapping("/unsaveJob/{id}")
+    @ResponseBody
+    public String unsaveJob(@PathVariable("id") int id) {
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		
+		//xoá khỏi list savedJob của currentUser luôn
+       int index = -1;
+		for (SavedJob savedJob : currentUser.getUser().getSavedJobs()) {
+		    if (savedJob.getJob().getId() == id) {
+		    	index =  currentUser.getUser().getSavedJobs().indexOf(savedJob);
+		    	break;
+		    }
+		}
+		if ( index != -1 ) currentUser.getUser().getSavedJobs().remove(index);
+     // Xử lý lưu công việc ở đây
+        userService.unsaveJob(currentUser.getUser(), jobService.getJobById(id));
+        
+        // Trả về phản hồi
+        return "Job unsaved successfully";
+    }
 }

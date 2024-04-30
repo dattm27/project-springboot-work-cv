@@ -1,17 +1,28 @@
 package com.workcv.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.workcv.model.Company;
+import com.workcv.model.FollowingCompany;
+import com.workcv.model.Job;
+import com.workcv.model.SavedJob;
 import com.workcv.model.User;
+import com.workcv.repository.FollowingCompanyRepository;
+import com.workcv.repository.SavedJobRepository;
 import com.workcv.repository.UserRepository;
 @Service
 public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private FollowingCompanyRepository followingCompanyRepository;
+	@Autowired 
+	private  SavedJobRepository savedJobRepository;
 	@Override
 	public List<User> getAllUsers() {
 		
@@ -64,6 +75,42 @@ public class UserServiceImpl implements UserService {
 	public User save(User user) {
 		User savedUser = userRepository.save(user);
 		return savedUser;
+	}
+	@Override
+	public void followCompany(User user, Company company) {
+		FollowingCompany followingCompany = new FollowingCompany();
+        followingCompany.setUser(user);
+        followingCompany.setCompany(company);
+        followingCompanyRepository.save(followingCompany);
+		
+	}
+	@Override
+	public SavedJob saveJob(User user, Job job) {
+		SavedJob savedJob = new SavedJob();
+        savedJob.setUser(user);
+        savedJob.setJob(job);
+        savedJobRepository.save(savedJob);
+        return savedJob;
+		
+	}
+	@Override
+	public List<Company> getFollowedCompanies(User user) {
+		 List<FollowingCompany> followingCompanies = followingCompanyRepository.findByUser(user);
+	        return followingCompanies.stream().map(FollowingCompany::getCompany).collect(Collectors.toList());
+	}
+	@Override
+	public List<Job> getSavedJobs(User user) {
+		List<SavedJob> savedJobs = savedJobRepository.findByUser(user);
+        return savedJobs.stream().map(SavedJob::getJob).collect(Collectors.toList());
+   
+	}
+	@Override
+	public void unsaveJob(User user, Job job) {
+		 SavedJob savedJob = savedJobRepository.findByUserAndJob(user, job);
+		    if (savedJob != null) {
+		        savedJobRepository.delete(savedJob);
+		    }
+		
 	}
 	
 

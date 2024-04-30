@@ -2,6 +2,9 @@ package com.workcv.service;
 
 import java.util.List;
 
+import com.workcv.model.Company;
+import com.workcv.model.Job;
+import com.workcv.model.SavedJob;
 import com.workcv.model.User;
 
 public interface UserService {
@@ -14,4 +17,10 @@ public interface UserService {
 	User getUserByEmail(String email);
 
 	User save(User user);
+	
+	void followCompany(User user, Company company);
+    SavedJob saveJob(User user, Job job);
+    void unsaveJob(User user, Job job) ;
+    List<Company> getFollowedCompanies(User user);
+    List<Job> getSavedJobs(User user);
 }

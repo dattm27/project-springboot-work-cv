@@ -21,151 +21,51 @@
 	<!--Modal hiển thị form ứng tuyển-->
 
 	<nav th:replace="fragments :: modal"></nav>
+
 	<!--Search -->
-	<section class="ftco-section ftco-no-pb bg-light">
-		<div class="container">
-			<div class="row justify-content-center mb-4">
-				<div class="col-md-7 text-center heading-section ">
-					<span class="subheading">Browse Jobs</span>
-					<h2 class="mb-4">Tìm kiếm nâng cao</h2>
-				</div>
-			</div>
-			<div class="row">
-				<div class="ftco-search">
-					<div class="row">
-						<div class="col-md-12 nav-link-wrap">
-							<div class="nav nav-pills text-center" id="v-pills-tab" role="tablist"
-								aria-orientation="vertical">
-								<a class="nav-link active mr-md-1" id="v-pills-1-tab" data-toggle="pill"
-									href="#v-pills-1" role="tab" aria-controls="v-pills-1" aria-selected="true">Tìm
-									việc</a>
-
-								<a class="nav-link" id="v-pills-2-tab" data-toggle="pill" href="#v-pills-2" role="tab"
-									aria-controls="v-pills-2" aria-selected="false">Tìm ứng viên</a>
-
-							</div>
-						</div>
-						<div class="col-md-12 tab-wrap">
-
-							<div class="tab-content p-4" id="v-pills-tabContent">
-
-								<div class="tab-pane fade show active" id="v-pills-1" role="tabpanel"
-									aria-labelledby="v-pills-nextgen-tab">
-									<form action="#" class="search-job">
-										<div class="row no-gutters">
-											<div class="col-md mr-md-2">
-												<div class="form-group">
-													<div class="form-field">
-														<div class="icon"><span class="icon-briefcase"></span></div>
-														<input type="text" class="form-control"
-															placeholder="eg. Garphic. Web Developer">
-													</div>
-												</div>
-											</div>
-											<div class="col-md mr-md-2">
-												<div class="form-group">
-													<div class="form-field">
-														<div class="select-wrap">
-															<div class="icon"><span class="ion-ios-arrow-down"></span>
-															</div>
-															<select name="" id="" class="form-control">
-																<option value="">Danh mục</option>
-																<option value="">Full Time</option>
-																<option value="">Part Time</option>
-																<option value="">Freelance</option>
-																<option value="">Internship</option>
-																<option value="">Temporary</option>
-															</select>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="col-md mr-md-2">
-												<div class="form-group">
-													<div class="form-field">
-														<div class="icon"><span class="icon-map-marker"></span></div>
-														<input type="text" class="form-control" placeholder="Địa điểm">
-													</div>
-												</div>
-											</div>
-											<div class="col-md">
-												<div class="form-group">
-													<div class="form-field">
-														<button type="submit" class="form-control btn btn-primary">Tìm
-															kiếm</button>
-													</div>
-												</div>
-											</div>
-										</div>
-									</form>
-								</div>
-
-								<div class="tab-pane " id="v-pills-2" role="tabpanel"
-									aria-labelledby="v-pills-performance-tab">
-									<form action="#" class="search-job">
-										<div class="row">
-											<div class="col-md">
-												<div class="form-group">
-													<div class="form-field">
-														<div class="icon"><span class="icon-user"></span></div>
-														<input type="text" class="form-control"
-															placeholder="eg. Adam Scott">
-													</div>
-												</div>
-											</div>
-											<div class="col-md">
-												<div class="form-group">
-													<div class="form-field">
-														<div class="select-wrap">
-															<div class="icon"><span class="ion-ios-arrow-down"></span>
-															</div>
-															<select name="" id="" class="form-control">
-																<option value="">Danh mục</option>
-																<option value="">Full Time</option>
-																<option value="">Part Time</option>
-																<option value="">Freelance</option>
-																<option value="">Internship</option>
-																<option value="">Temporary</option>
-															</select>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="col-md">
-												<div class="form-group">
-													<div class="form-field">
-														<div class="icon"><span class="icon-map-marker"></span></div>
-														<input type="text" class="form-control" placeholder="Địa điểm">
-													</div>
-												</div>
-											</div>
-											<div class="col-md">
-												<div class="form-group">
-													<div class="form-field border">
-														<button type="submit" class="form-control btn btn-primary">Tìm
-															kiếm</button>
-													</div>
-												</div>
-											</div>
-										</div>
-									</form>
-								</div>
-							</div>
-						</div>
+	<div class="container d-flex justify-content-center">
+		<div class="text-center pt-3 pb-3">
+			<h4>Tìm kiếm công việc</h4>
+			<form action="#" class="search-job">
+				<div class="row">
+					<div class="col-md-3">
+						<input type="text" class="form-control" name="title" placeholder="Tiêu đề công việc"
+							th:value="${param.title != null ? param.title : ''}">
+					</div>
+					<div class="col-md-3">
+						<select class="form-control" name ="type" >
+							<option value="${param.type!= null ? param.type : 'Chọn loại công việc'} " th:text="${param.type!= null ? param.type : 'Chọn loại công việc'} ">Chọn loại công việc</option>
+							<option value="Full-time" >Full-time</option>
+							<option value="Part-time" >Part-time</option>
+							<option value="Freelancer">Freelancer</option>
+						</select>
+					</div>
+					<div class="col-md-3">
+						<input type="text" class="form-control" name="location" placeholder="Địa điểm làm việc"
+							th:value="${param.location != null ? param.location : ''}">
+					</div>
+					<div class="col-md-3">
+						<button type="submit" class="btn btn-primary">Tìm kiếm</button>
 					</div>
 				</div>
-			</div>
+			</form>
 		</div>
-	</section>
+	</div>
+
 	<!--Công việc-->
-	<section class="ftco-section bg-light">
+	<section class=" bg-light mt-2">
 		<div class="container">
 
 			<div class="row">
 				<div class="col-lg-8 pr-lg-4">
 					<h4>Công việc nổi bật <i class="bi bi-0-square"></i> </h4>
 					<div class="row">
-						<div th:each="job: ${jobs}" class="col-md-12 ">
+						<div th:each="job: ${jobs}" class="col-md-12 "
+							th:if="${job.title.toLowerCase().contains(param.title != null ? #strings.toLowerCase(param.title) : '') 
+							and job.address.toLowerCase().contains(param.location != null ?  #strings.toLowerCase(param.location) : '')
+							and job.type.toLowerCase().contains(param.type !=null?  #strings.toLowerCase(param.type) : '')}
+							">
+							
 							<div class="job-post-item p-4 d-block d-lg-flex align-items-center">
 								<div class="one-third mb-4 mb-md-0">
 									<div class="job-post-item-header align-items-center">
@@ -205,6 +105,7 @@
 						</div>
 					</div>
 				</div>
+
 				<!--công ty nổi bật-->
 				<div class="col-lg-4 sidebar">
 					<div class="row justify-content-center pb-3 ">
@@ -247,6 +148,7 @@
 					</th:block>
 
 				</div>
+
 	</section>
 
 
@@ -310,6 +212,7 @@
 		}
 
 	</script>
+
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

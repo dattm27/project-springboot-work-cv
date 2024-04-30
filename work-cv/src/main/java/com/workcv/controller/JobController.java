@@ -26,6 +26,7 @@ import com.workcv.model.Category;
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
 import com.workcv.model.Job;
+import com.workcv.model.SavedJob;
 import com.workcv.service.CategoryService;
 import com.workcv.service.CompanyService;
 import com.workcv.service.JobService;
@@ -192,9 +193,18 @@ public class JobController {
 	public String showDetailJd(Model model, @PathVariable("id") int id) {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
+		
 		model.addAttribute("username", currentUser.getFullName());
 		model.addAttribute("role", currentUser.getRole());
 		Job job = jobService.getJobById(id);
+		
+		boolean saved = false;
+		for (SavedJob savedJob : currentUser.getUser().getSavedJobs()) {
+		    if (savedJob.getJob().getId() == id) {
+		        saved = true;
+		        break;
+		    }
+		}
 		// tăng view
 		int view = job.getView();
 		job.setView(view + 1);
@@ -202,6 +212,7 @@ public class JobController {
 		Optional<Company> company = companyService.getCompanyById(job.getCompany().getId());
 		model.addAttribute("company", company.get());
 		model.addAttribute("job", job);
+		model.addAttribute("saved", saved);
 		return "job-detail";
 	}
 
