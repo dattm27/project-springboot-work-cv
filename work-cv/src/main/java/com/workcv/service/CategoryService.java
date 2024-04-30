@@ -5,4 +5,5 @@ import com.workcv.model.Category;
 public interface CategoryService {
 	List<Category> getAllCategories ();
 	Category save(Category category);
+	List<Object[]> getTrendyCategories() ;
 }

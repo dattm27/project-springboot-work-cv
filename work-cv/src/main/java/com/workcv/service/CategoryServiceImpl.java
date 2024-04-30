@@ -21,5 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
 		Category savedCategory = categoryRepository.save(category);
 		return savedCategory;
 	}
+	@Override
+	public List<Object[]> getTrendyCategories() {
+		List<Object[]> trendyCategories= categoryRepository.findAllWithJobCount();
+		return trendyCategories;
+	}
 
 }

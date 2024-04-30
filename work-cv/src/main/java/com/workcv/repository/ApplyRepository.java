@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.workcv.model.Apply;
-import com.workcv.model.ApplyInfo;
+
 @Repository
 public interface ApplyRepository  extends JpaRepository<Apply, Integer>{
 

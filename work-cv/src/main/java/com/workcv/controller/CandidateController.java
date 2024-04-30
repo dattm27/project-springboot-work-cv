@@ -110,7 +110,7 @@ public class CandidateController {
 		}
 		else {
 			model.addAttribute("error", "Bạn đã ứng tuyển công việc này");
-			return "error";
+			return "custom-error";
 		}
 		
 	}

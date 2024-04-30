@@ -27,7 +27,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.workcv.model.Apply;
-import com.workcv.model.ApplyInfo;
+
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
 import com.workcv.model.Job;

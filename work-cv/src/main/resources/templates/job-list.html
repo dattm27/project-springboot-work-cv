@@ -19,9 +19,9 @@
 
 	<nav th:replace="fragments :: navbar"></nav>
 	<!--Modal hiển thị form ứng tuyển-->
-	
+
 	<nav th:replace="fragments :: modal"></nav>
-	
+
 	<div class="hero-wrap hero-wrap-2" style="background-image: url('/assets/images/bg_1.jpg');"
 		data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>
@@ -40,60 +40,32 @@
 			<div class="row justify-content-center mb-5">
 				<div class="col-md-7 heading-section text-center ">
 					<span class="subheading">Job Categories</span>
-					<h2 class="mb-0">Top Categories</h2>
+					<h2 class="mb-0">Danh mục nổi bật</h2>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-3 ">
-					<ul class="category text-center">
-						<li><a href="#">Web Development <br><span class="number">354</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Graphic Designer <br><span class="number">143</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Multimedia <br><span class="number">100</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Advertising <br><span class="number">90</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-					</ul>
+			
+				<div class="container-fluid" style="overflow-x: auto;">
+					<div class="row justify-content-center">
+						<!-- Loop through categories -->
+						<th:block th:each="category : ${categories}">
+							<!-- Tạo một div col-md-3 cho mỗi category -->
+							<div class="col-md-3">
+								<div class="card text-center" style="width: 18rem;">
+									<div class="card-body">
+										<h5 class="card-title text-primary" th:text="${category[1]}">Tên</h5>
+										<!--<h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>-->
+										<p class="card-text" th:text="${category[2]}+ ' vị trí'">Số vị trí</p>
+										<!--<a href="#" class="card-link">Card link</a>
+										<a href="#" class="card-link">Another link</a>-->
+									</div>
+								</div>
+							</div>
+						</th:block>
+					</div>
 				</div>
-				<div class="col-md-3 ">
-					<ul class="category text-center">
-						<li><a href="#">Education &amp; Training <br><span class="number">100</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">English <br><span class="number">200</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Social Media <br><span class="number">300</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Writing <br><span class="number">150</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-					</ul>
-				</div>
-				<div class="col-md-3 ">
-					<ul class="category text-center">
-						<li><a href="#">PHP Programming <br><span class="number">400</span> <span>Open position</span><i
-									class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Project Management <br><span class="number">100</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Finance Management <br><span class="number">222</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Office &amp; Admin <br><span class="number">123</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-					</ul>
-				</div>
-				<div class="col-md-3 ">
-					<ul class="category text-center">
-						<li><a href="#">Web Designer <br><span class="number">324</span> <span>Open
-									position</span></span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Customer Service <br><span class="number">564</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Marketing &amp; Sales <br><span class="number">234</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-						<li><a href="#">Software Development <br><span class="number">425</span> <span>Open
-									position</span><i class="ion-ios-arrow-forward"></i></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
+	
+
+
 	</section>
 	<!--Search -->
 	<section class="ftco-section ftco-no-pb bg-light">
@@ -270,7 +242,8 @@
 											<span class="icon-heart"></span>
 										</a>
 									</div>
-									<button th:onclick="'sendApplication(' + ${job.id} + ')'" class="btn btn-primary ">Ứng tuyển</button>
+									<button th:if="${role=='candidate'}" th:onclick="'sendApplication(' + ${job.id} + ')'"
+										class="btn btn-primary ">Ứng tuyển</button>
 								</div>
 							</div>
 						</div>
@@ -407,6 +380,7 @@
 		}
 
 	</script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

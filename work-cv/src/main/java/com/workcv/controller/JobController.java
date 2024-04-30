@@ -212,8 +212,12 @@ public class JobController {
 				.getPrincipal();
 		model.addAttribute("role", currentUser.getRole());
 		model.addAttribute("username", currentUser.getFullName());
+		//list  trendy jobs theo chiều số lượng người ứng tuyển giảm rồi
 		List<Job> jobs = jobService.getAvailableJobs();
+		//thêm list danh mục nổi bật (có nhiều jobs)
+		List<Object[]> categories = categoryService.getTrendyCategories();
 		model.addAttribute("jobs", jobs);
+		model.addAttribute("categories", categories);
 		return "job-list";
 	}
 }

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workcv.model.Apply;
-import com.workcv.model.ApplyInfo;
+
 import com.workcv.repository.ApplyRepository;
 
 @Service

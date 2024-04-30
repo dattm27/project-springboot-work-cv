@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.workcv.model.Category;
 import com.workcv.model.Company;
 import com.workcv.model.Job;
+import com.workcv.service.CategoryService;
 import com.workcv.service.CompanyService;
 import com.workcv.service.JobService;
 import com.workcv.service.UserService;
@@ -37,6 +39,8 @@ public class HomeController {
     private CompanyService companyService;
 	@Autowired
     private JobService jobService;
+	@Autowired
+	private  CategoryService categoryService;
 	@Autowired
     private UserService userService;// Đây là một interface/service xử lý logic liên quan đến người dùng
 	@GetMapping("/")
@@ -70,6 +74,9 @@ public class HomeController {
 	    //thêm các job nổi bật vào
 	    List<Job> trendyJobs = jobService.getTrendyJob();
 	    model.addAttribute("jobs", trendyJobs);
+	  //thêm list danh mục nổi bật (có nhiều jobs)
+	  	List<Object[]> categories = categoryService.getTrendyCategories();
+	  	model.addAttribute("categories", categories);
 		return "index";
 	}
 	@GetMapping("/candidate")
