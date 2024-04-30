@@ -61,9 +61,19 @@ public class JobController {
 	// lưu job (thêm job mới + cập nhật job cũ)
 	@PostMapping("/employer/save-job")
 	public String processCreateJob(@ModelAttribute("job") Job job, RedirectAttributes redirectAttributes,
-			@RequestParam("deadline") String deadlineString, @RequestParam("command") String command) {
+			@RequestParam("deadline") String deadlineString, @RequestParam("command") String command, @RequestParam(value = "newCategory", required = false) String newCategory) {
 		// Định dạng ngày tháng "dd/MM/yyyy"
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		//Xử lý xem có phải danh mục mới không
+		if (job.getCategory().getId() == 2) { // Id = 2 trong cơ sở dữ liệu chính là khác
+			//thêm category mới
+			Category category = new Category();
+			category.setName(newCategory);
+			//lưu category mới vào cơ sở dữ liệu
+			categoryService.save(category);
+			//đắt category mới cho job
+			job.setCategory(category);
+		}
 		// đây là khi form gửi tới là tạo mới job
 		if (command.equalsIgnoreCase("create")) {
 			// Lấy ngày hiện tại

@@ -54,7 +54,7 @@ public class EmployerController {
 	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/employer";
 
 	@GetMapping("/company-profile")
-	public String editProfile(HttpServletRequest request, Model model) throws IOException {
+	public String editProfile(HttpServletRequest request, Model model) throws Exception {
 		// Kiểm tra xem flash scope có chứa attribute "updateSuccess" không - tức là lúc
 		// này vừa mới cập nhật xong là được redirect
 		if (request.getAttribute("updateSuccess") != null) {

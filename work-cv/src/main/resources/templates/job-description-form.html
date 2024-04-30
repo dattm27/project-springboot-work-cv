@@ -84,14 +84,22 @@
 					<option value="">Chọn danh mục</option>
 					<!-- Hiển thị danh sách các danh mục có sẵn -->
 					<option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">
+					
 					</option>
+					
 				</select>
+			</div>
+			<div class="mb-3"  id="newCategoryInput"  style="display: none;">
+				<label for="newCategory" class="form-label">Danh mục khác:</label>
+				<input type="text" class="form-control" id="newCategory" name="newCategory" >
 			</div>
 			<div class="mb-3">
 				<label for="status" class="form-label">Trạng thái:</label>
-				<select class="form-select" id="status" name="status" th:field="*{status}">
+				<select class="form-select" id="status" name="status" th:field="*{status}" required>
 					<option value="1">Nhận ứng viên</option>
 					<option value="0">Dừng nhận ứng viên</option>
+					
+					
 				</select>
 			 </div>
 			<input type="hidden" name="command" th:value="${command}">
@@ -118,6 +126,24 @@
 			});
 		});
 	</script>
+	<!--Danh mục khác-->
+	<script>
+    // Lắng nghe sự kiện thay đổi trên select
+    document.getElementById('category').addEventListener('change', function() {
+        // Lấy giá trị được chọn
+        var selectedValue = this.value;
+        // Kiểm tra nếu là tùy chọn "Tạo danh mục mới"
+        if (selectedValue === '2') {
+            // Hiển thị trường nhập danh mục mới
+            document.getElementById('newCategoryInput').style.display = 'block';
+            document.getElementById('newCategory').required = true;
+        } else {
+            // Ẩn trường nhập danh mục mới
+            document.getElementById('newCategoryInput').style.display = 'none';
+            document.getElementById('newCategory').required = false;
+        }
+    });
+</script>
 </body>
 
 </html>
