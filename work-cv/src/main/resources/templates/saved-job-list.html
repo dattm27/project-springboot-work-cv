@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<title>Công việc đã lưu</title>
+	<!-- Bootstrap CSS -->
+	<div th:replace="fragments :: css"> </div>
+	<link rel="stylesheet" href="/assets/css/style.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+	<div th:replace="fragments :: css"></div>
+	<style>
+		.toast {
+			position: fixed;
+			bottom: 20px;
+			left: 20px;
+			z-index: 1000;
+		}
+	</style>
+
+	<!-- Custom CSS -->
+	<style>
+		/* Custom gradient background */
+		.gradient-background {
+			background: linear-gradient(45deg, #ff8a00, #e52e71);
+			height: 50vh;
+			/* Chiều cao của phần bìa, ở đây là 50% của chiều cao màn hình */
+			color: white;
+			position: relative;
+		}
+
+		/* Center align content */
+		.center-content {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<!--Thêm navbar -->
+
+	<nav th:replace="fragments :: navbar"></nav>
+	<!--Thêm modal cho việc ứng tuyển-->
+	<nav th:replace="fragments :: modal"></nav>
+	<!-- Thêm một phần tử toast vào trang HTML -->
+	<div class="toast" id="saveJobToast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+		<div class="toast-header">
+			<strong class="mr-auto">Thông báo</strong>
+			<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="toast-body">
+			Công việc đã được lưu thành công.
+		</div>
+	</div>
+
+
+	<div class="container-fluid gradient-background">
+		<div class="row center-content">
+			<div class="col-lg-12">
+				<h1>Danh sách công việc đã lưu</h1>
+			</div>
+		</div>
+	</div>
+	<!-- Bootstrap JS (Optional) -->
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<!--Công việc-->
+	<div class=>
+		<section class=" bg-light mt-2">
+			<div class="container">
+
+				<div class="row justify-content-center">
+					<div class="col-lg-10 pr-lg-4">
+
+						<div class="row">
+							<div th:each="job: ${jobs}" class="col-md-12 " th:if="${job.title.toLowerCase().contains(param.title != null ? #strings.toLowerCase(param.title) : '') 
+							and job.address.toLowerCase().contains(param.location != null ?  #strings.toLowerCase(param.location) : '')
+							and job.type.toLowerCase().contains(param.type !=null?  #strings.toLowerCase(param.type) : '')}
+							" >
+							<div th:id="'job_'+${job.id}">
+								<div class="job-post-item p-4 d-block d-lg-flex align-items-center"  >
+									<div class="one-third mb-4 mb-md-0">
+										<div class="job-post-item-header align-items-center">
+											<span class="subadge" th:text="${job.type}">Partime</span>
+											<h2 class="mr-3 text-black"><a
+													th:href="@{/job/details/{jobId}(jobId=${job.id})}"
+													th:text="${job.title}">Frontend
+													Development</a></h2>
+										</div>
+										<div class="job-post-item-body d-block d-md-flex">
+											<div class="mr-3"><span class="icon-layers"></span> <a href="#"
+													th:text="${job.company.name}">Facebook,
+													Inc.</a></div>
+											<div class="mr-3"><span class="icon-my_location"></span> <span
+													th:text="${job.address}">Western City, UK</span></div>
+											<div class="mr-3"><span class="material-symbols-outlined">
+													visibility
+												</span> <span th:text="${job.view}">Số view</span></div>
+											<div class="mr-3"><span class="material-symbols-outlined">
+													how_to_reg
+												</span> <span th:text="${job.numOfApplicants}">Đã ứng tuyển</span></div>
+										</div>
+									</div>
+
+									<div class="one-third ml-auto d-flex align-items-center mt-4 md-md-0">
+
+										<button th:if="${role=='candidate'}"
+											th:onclick="'sendApplication(' + ${job.id} + ')'"
+											class="btn btn-primary ml-3 mr-3">Ứng
+											tuyển</button>
+										<button th:if="${role=='candidate'}" th:onclick="'unsaveJob(' + ${job.id} + ')'"
+											class="btn btn-outline-primary ">Huỷ lưu</button>
+
+
+									</div>
+
+								</div>
+							</div>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	<!--Script cho việc ứng tuyển-->
+	<script>
+		//ẩn một job
+		function hideJob(jobId) {
+			var jobElement = document.getElementById("job_" + jobId);
+	
+			
+				jobElement.style.display = "none";
+			
+		}
+		function showToast(message) {
+			// Lấy ra phần tử toast
+			var toast = document.getElementById('saveJobToast');
+
+			// Đặt nội dung cho toast
+			var toastBody = toast.querySelector('.toast-body');
+			toastBody.textContent = message;
+
+			// Hiển thị toast
+			var bootstrapToast = new bootstrap.Toast(toast);
+			bootstrapToast.show();
+		}
+		function apply(job_id) {
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+			var confirmMessage = "Bạn có chắc muốn ứng tuyển công việc này không?";
+
+			if (confirm(confirmMessage)) {
+
+
+				// Tạo một yêu cầu POST
+				fetch('/apply/save-apply/' + job_id, {
+					method: 'POST',
+					headers: {
+						'X-CSRF-TOKEN': csrfToken
+					},
+
+				})
+					.then(response => {
+						if (response.ok) {
+							// Xử lý khi yêu cầu thành công
+							alert("ứng tuyển thành công. Đang chờ xét duyệt");
+							console.log('Đã ứng tuyển thành công!');
+							// Có thể thêm các logic xử lý khác ở đây nếu cần
+						} else {
+							// Xử lý khi có lỗi
+							console.error('Lỗi khi ứng tuyển công việc:', response.statusText);
+						}
+					})
+					.catch(error => {
+						// Xử lý khi có lỗi trong quá trình gửi yêu cầu
+						console.error('Lỗi khi gửi yêu cầu ứng tuyển:', error);
+					});
+			}
+		}
+		// Xử lý huỷ  lưu job
+
+		function unsaveJob(jobId) {
+			// Lấy CSRF token từ meta tag
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+			// Xác nhận với người dùng trước khi thực hiện lưu công việc
+			{
+				// Tạo một đối tượng XMLHttpRequest
+				var xhr = new XMLHttpRequest();
+
+				// Đặt phương thức và URL của yêu cầu
+				xhr.open("POST", "/candidate/unsaveJob/" + jobId, true);
+
+				// Đặt tiêu đề của yêu cầu
+				xhr.setRequestHeader("Content-Type", "application/json");
+				xhr.setRequestHeader("X-CSRF-TOKEN", csrfToken);
+
+				// Xử lý sự kiện khi yêu cầu hoàn thành
+				xhr.onload = function () {
+					if (xhr.status === 200) {
+						// Xử lý phản hồi từ máy chủ nếu cần
+						console.log(xhr.responseText);
+						// Hiển thị thông báo đã huỷ lưu thành công
+						//alert("Công việc đã được huỷ lưu thành công!");
+						// Hiển thị toast nếu công việc đã được huỷ lưu thành công
+
+
+
+							var jobElement = document.getElementById("job_" + jobId);
+	
+			
+						jobElement.style.display = "none";
+						showToast('Công việc đã được huỷ lưu');
+
+					} else {
+						// Xử lý lỗi nếu cần
+
+						alert("Lỗi khi huỷ lưu công việc");
+					}
+				};
+
+				// Xử lý lỗi kết nối
+				xhr.onerror = function () {
+					console.error("Request failed");
+					alert("Lỗi kết nối. Không thể huỷ lưu công việc.");
+				};
+
+				// Gửi yêu cầu với dữ liệu JSON chứa ID của công việc
+				xhr.send(JSON.stringify({jobId: jobId}));
+			}
+		}
+	</script>
+
+</body>
+
+</html>

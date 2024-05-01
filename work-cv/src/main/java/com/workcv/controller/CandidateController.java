@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,7 @@ import com.workcv.model.CV;
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
 import com.workcv.model.FollowingCompany;
+import com.workcv.model.Job;
 import com.workcv.model.SavedJob;
 import com.workcv.model.User;
 import com.workcv.service.ApplyService;
@@ -190,5 +193,22 @@ public class CandidateController {
 		//xoá khỏi cơ sở dữ liệu
 		userService.unfollowCompany(currentUser.getUser(), companyService.getCompanyById(id).get());
 		return "unfollow company successfully";
+	}
+	
+	@GetMapping("/saved-job-list")
+	public String showSavedJobsList(Model model) {
+		//Lấy ra người dùng hiện tại
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		model.addAttribute("role", currentUser.getRole());
+		model.addAttribute("username", currentUser.getFullName());
+		List<SavedJob> savedJobs = currentUser.getUser().getSavedJobs();
+		List<Job> savedJobList = new ArrayList<>();
+
+		for (SavedJob savedJob : savedJobs) {
+		    savedJobList.add(savedJob.getJob());
+		}
+		model.addAttribute("jobs",savedJobList);
+		return "saved-job-list";
 	}
 }
