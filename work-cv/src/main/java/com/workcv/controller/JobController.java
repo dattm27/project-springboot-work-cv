@@ -25,11 +25,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.workcv.model.Category;
 import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
+import com.workcv.model.FollowingCompany;
 import com.workcv.model.Job;
 import com.workcv.model.SavedJob;
 import com.workcv.service.CategoryService;
 import com.workcv.service.CompanyService;
 import com.workcv.service.JobService;
+import com.workcv.service.UserService;
 
 @Controller
 @RequestMapping("/job")
@@ -40,6 +42,8 @@ public class JobController {
 	private CompanyService companyService;
 	@Autowired
 	private JobService jobService;
+	@Autowired
+	private UserService userService;
 
 	@GetMapping("/employer/create-job")
 	public String createJob(Model model) {
@@ -62,17 +66,18 @@ public class JobController {
 	// lưu job (thêm job mới + cập nhật job cũ)
 	@PostMapping("/employer/save-job")
 	public String processCreateJob(@ModelAttribute("job") Job job, RedirectAttributes redirectAttributes,
-			@RequestParam("deadline") String deadlineString, @RequestParam("command") String command, @RequestParam(value = "newCategory", required = false) String newCategory) {
+			@RequestParam("deadline") String deadlineString, @RequestParam("command") String command,
+			@RequestParam(value = "newCategory", required = false) String newCategory) {
 		// Định dạng ngày tháng "dd/MM/yyyy"
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		//Xử lý xem có phải danh mục mới không
+		// Xử lý xem có phải danh mục mới không
 		if (job.getCategory().getId() == 2) { // Id = 2 trong cơ sở dữ liệu chính là khác
-			//thêm category mới
+			// thêm category mới
 			Category category = new Category();
 			category.setName(newCategory);
-			//lưu category mới vào cơ sở dữ liệu
+			// lưu category mới vào cơ sở dữ liệu
 			categoryService.save(category);
-			//đắt category mới cho job
+			// đắt category mới cho job
 			job.setCategory(category);
 		}
 		// đây là khi form gửi tới là tạo mới job
@@ -193,26 +198,38 @@ public class JobController {
 	public String showDetailJd(Model model, @PathVariable("id") int id) {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		
+
 		model.addAttribute("username", currentUser.getFullName());
 		model.addAttribute("role", currentUser.getRole());
 		Job job = jobService.getJobById(id);
-		
+		// xem người dùng save job này chưa
 		boolean saved = false;
 		for (SavedJob savedJob : currentUser.getUser().getSavedJobs()) {
-		    if (savedJob.getJob().getId() == id) {
-		        saved = true;
-		        break;
-		    }
+			if (savedJob.getJob().getId() == id) {
+				saved = true;
+				break;
+			}
 		}
+		model.addAttribute("saved", saved);
+
 		// tăng view
 		int view = job.getView();
 		job.setView(view + 1);
 		jobService.save(job);
+		// Thêm thông tin công ty của job này
 		Optional<Company> company = companyService.getCompanyById(job.getCompany().getId());
 		model.addAttribute("company", company.get());
 		model.addAttribute("job", job);
-		model.addAttribute("saved", saved);
+
+		// xem người dùng theo dõi công ty này chưa
+		boolean following = false;
+		FollowingCompany followingCompany = userService.getFollowingCompanyByUserIdAndCompanyId(currentUser.getUser(),
+				companyService.getCompanyById(company.get().getId()).get());
+		if (followingCompany != null) {
+			following = true;
+		}
+		model.addAttribute("following", following);
+
 		return "job-detail";
 	}
 
@@ -223,11 +240,11 @@ public class JobController {
 				.getPrincipal();
 		model.addAttribute("role", currentUser.getRole());
 		model.addAttribute("username", currentUser.getFullName());
-		//list  trendy jobs theo chiều số lượng người ứng tuyển giảm rồi
+		// list trendy jobs theo chiều số lượng người ứng tuyển giảm rồi
 		List<Job> jobs = jobService.getAvailableJobs();
-		//thêm list danh mục nổi bật (có nhiều jobs)
+		// thêm list danh mục nổi bật (có nhiều jobs)
 		List<Object[]> categories = categoryService.getTrendyCategories();
-		//them list cong ty noi bat
+		// them list cong ty noi bat
 		List<Object[]> companies = companyService.getTopCompanies();
 		model.addAttribute("jobs", jobs);
 		model.addAttribute("categories", categories);

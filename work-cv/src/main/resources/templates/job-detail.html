@@ -61,7 +61,7 @@
 				<div class="d-grid gap-2 mb-1" th:if="${role!='employer'}">
 					<button class="btn btn-primary" type="button" th:onclick="'sendApplication(' + ${job.id} + ')'">Ứng
 						tuyển</button>
-					
+					<input type="hidden" id="isSavedJob" th:value="${saved}">
 					<button class="btn btn-outline-primary" type="button" id="saveJob"
 						th:onclick="'saveJob(' + ${job.id} + ')'"> Lưu</button>
 					<button class="btn btn-outline-primary" type="button" id="unsaveJob"
@@ -100,7 +100,11 @@
 					</ul>
 					<div class="card-body">
 						<a href="#" class="card-link">Các công việc</a>
-						<a href="#" class="card-link">Theo dõi</a>
+						<input type="hidden" id="isFollowing" th:value="${following}">
+						<button type="button" id="followCompany" th:onclick="'followCompany(' + ${company.id} + ')'"
+							class=" ml-2 btn btn-outline-primary">Theo dõi</button>
+						<button type="button" id="unfollowCompany" th:onclick="'unfollowCompany(' + ${company.id} + ')'"
+							class=" ml-2 btn btn-outline-primary">Huỷ theo dõi</button>
 					</div>
 				</div>
 
@@ -117,10 +121,13 @@
 	<script>
 		document.addEventListener("DOMContentLoaded", function () {
 			var savedInput = document.getElementById("isSavedJob");
+			var followingInput = document.getElementById("isFollowing");
 			var saved = savedInput.value;
+			var following = followingInput.value;
 			var saveButton = document.getElementById("saveJob");
 			var unsaveButton = document.getElementById("unsaveJob");
-
+			var followButton = document.getElementById("followCompany");
+			var unfollowButton = document.getElementById("unfollowCompany");
 			if (saved === 'true') {
 				// Nếu đã lưu công việc, ẩn nút "Lưu" và hiển thị nút "Bỏ lưu"
 				saveButton.style.display = "none";
@@ -129,6 +136,15 @@
 				// Nếu chưa lưu công việc, hiển thị nút "Lưu" và ẩn nút "Bỏ lưu"
 				saveButton.style.display = "block";
 				unsaveButton.style.display = "none";
+			}
+			if (following === 'true') {
+				followButton.style.display = "none";
+				unfollowButton.style.display = "inline-block";
+
+			}
+			else {
+				followButton.style.display = "inline-block";
+				unfollowButton.style.display = "none";
 			}
 		});
 
@@ -158,13 +174,13 @@
 				}
 			});
 		}
-
+		<!--Khi người dùng bấm lưu công việc-->
 		function saveJob(jobId) {
 			var saveButton = document.getElementById("saveJob");
-						var unsaveButton = document.getElementById("unsaveJob");
+			var unsaveButton = document.getElementById("unsaveJob");
 			// Lấy CSRF token từ meta tag
 			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-	
+
 			// Xác nhận với người dùng trước khi thực hiện lưu công việc
 			{
 				// Tạo một đối tượng XMLHttpRequest
@@ -185,9 +201,9 @@
 						// Hiển thị thông báo đã lưu thành công
 						//alert("Công việc đã được lưu thành công!");
 						// Hiển thị toast nếu công việc đã được lưu thành công
-					
-						
-						
+
+
+
 						saveButton.style.display = "none";
 						unsaveButton.style.display = "block";
 						showToast('Công việc đã được lưu thành công.');
@@ -237,11 +253,11 @@
 						//alert("Công việc đã được huỷ lưu thành công!");
 						// Hiển thị toast nếu công việc đã được huỷ lưu thành công
 
-						
-						
+
+
 						saveButton.style.display = "block";
 						unsaveButton.style.display = "none";
-						showToast('Công việc đã được huỷ l');
+						showToast('Công việc đã được huỷ lưu');
 
 					} else {
 						// Xử lý lỗi nếu cần
@@ -260,6 +276,112 @@
 				xhr.send(JSON.stringify({jobId: jobId}));
 			}
 		}
+
+		//Khi người dùng bấm theo dõi công ty
+		function followCompany(companyId) {
+			//lất các nút
+			var followButton = document.getElementById("followCompany");
+			var unfollowButton = document.getElementById("unfollowCompany");
+			// Lấy CSRF token từ meta tag
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+			// Xác nhận với người dùng trước khi thực hiện lưu công việc
+			{
+				// Tạo một đối tượng XMLHttpRequest
+				var xhr = new XMLHttpRequest();
+
+				// Đặt phương thức và URL của yêu cầu
+				xhr.open("POST", "/candidate/followCompany/" + companyId, true);
+
+				// Đặt tiêu đề của yêu cầu
+				xhr.setRequestHeader("Content-Type", "application/json");
+				xhr.setRequestHeader("X-CSRF-TOKEN", csrfToken);
+
+				// Xử lý sự kiện khi yêu cầu hoàn thành
+				xhr.onload = function () {
+					if (xhr.status === 200) {
+						// Xử lý phản hồi từ máy chủ nếu cần
+						console.log(xhr.responseText);
+						// Hiển thị thông báo đã theo dõi thành công
+						//alert("Theo dõi thành công");
+						// Hiển thị toast nếu theo dõi thành công
+
+
+
+						followButton.style.display = "none";
+						unfollowButton.style.display = "inline-block";
+						showToast('Theo dõi công ty thành công');
+					} else {
+						// Xử lý lỗi nếu cần
+						console.error(xhr.statusText);
+						alert("Đã theo dõi công ty trước đó");
+					}
+				};
+
+				// Xử lý lỗi kết nối
+				xhr.onerror = function () {
+					console.error("Request failed");
+					alert("Lỗi kết nối. Không thể theo dõi công ty.");
+				};
+
+				// Gửi yêu cầu với dữ liệu JSON chứa ID của công việc
+				xhr.send(JSON.stringify({companyId: companyId}));
+			}
+		}
+
+		// Xử lý huỷ  theo dõi công ty
+
+		function unfollowCompany(companyId) {
+			// Lấy CSRF token từ meta tag
+			var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+			//lất các nút
+			var followButton = document.getElementById("followCompany");
+			var unfollowButton = document.getElementById("unfollowCompany");
+			// Xác nhận với người dùng trước khi thực hiện lưu công việc
+			{
+				// Tạo một đối tượng XMLHttpRequest
+				var xhr = new XMLHttpRequest();
+
+				// Đặt phương thức và URL của yêu cầu
+				xhr.open("POST", "/candidate/unfollowCompany/" + companyId, true);
+
+				// Đặt tiêu đề của yêu cầu
+				xhr.setRequestHeader("Content-Type", "application/json");
+				xhr.setRequestHeader("X-CSRF-TOKEN", csrfToken);
+
+				// Xử lý sự kiện khi yêu cầu hoàn thành
+				xhr.onload = function () {
+					if (xhr.status === 200) {
+						// Xử lý phản hồi từ máy chủ nếu cần
+						console.log(xhr.responseText);
+						// Hiển thị thông báo đã huỷ lưu thành công
+						//alert("Công việc đã được huỷ lưu thành công!");
+						// Hiển thị toast nếu công việc đã được huỷ lưu thành công
+
+
+						followButton.style.display = "inline-block";
+						unfollowButton.style.display = "none";
+
+						showToast('Huỷ theo dõi thành công');
+
+					} else {
+						// Xử lý lỗi nếu cần
+
+						alert("Lỗi khi huỷ theo dõi công ty");
+					}
+				};
+
+				// Xử lý lỗi kết nối
+				xhr.onerror = function () {
+					console.error("Request failed");
+					alert("Lỗi kết nối. Không thể huỷ theo dõi công ty .");
+				};
+
+				// Gửi yêu cầu với dữ liệu JSON chứa ID của công việc
+						xhr.send(JSON.stringify({companyId: companyId}));
+			}
+		}
+
 	</script>
 
 

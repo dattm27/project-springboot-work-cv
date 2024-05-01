@@ -77,11 +77,12 @@ public class UserServiceImpl implements UserService {
 		return savedUser;
 	}
 	@Override
-	public void followCompany(User user, Company company) {
+	public FollowingCompany followCompany(User user, Company company) {
 		FollowingCompany followingCompany = new FollowingCompany();
         followingCompany.setUser(user);
         followingCompany.setCompany(company);
         followingCompanyRepository.save(followingCompany);
+        return followingCompany;
 		
 	}
 	@Override
@@ -111,6 +112,21 @@ public class UserServiceImpl implements UserService {
 		        savedJobRepository.delete(savedJob);
 		    }
 		
+	}
+	@Override
+	public void unfollowCompany(User user, Company company) {
+		FollowingCompany followingCompany = followingCompanyRepository.findByUserAndCompany(user, company);
+		if ( followingCompany != null) {
+			followingCompanyRepository.delete(followingCompany);
+		}
+		
+	}
+	
+	//lấy ra một following company để phục vụ huỷ theo dõi
+	@Override
+	public FollowingCompany getFollowingCompanyByUserIdAndCompanyId(User user, Company company) {
+		FollowingCompany followingCompany = followingCompanyRepository.findByUserAndCompany(user, company);
+		return followingCompany;
 	}
 	
 

@@ -25,10 +25,13 @@ import org.springframework.core.io.FileSystemResource;
 
 import com.workcv.model.Apply;
 import com.workcv.model.CV;
+import com.workcv.model.Company;
 import com.workcv.model.CustomUserDetails;
+import com.workcv.model.FollowingCompany;
 import com.workcv.model.SavedJob;
 import com.workcv.model.User;
 import com.workcv.service.ApplyService;
+import com.workcv.service.CompanyService;
 import com.workcv.service.CvService;
 import com.workcv.service.JobService;
 import com.workcv.service.UserService;
@@ -45,6 +48,9 @@ public class CandidateController {
 	private ApplyService applyService;
 	@Autowired
 	private JobService jobService;
+	@Autowired
+	private CompanyService companyService;
+	
 
 	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/cv";
 
@@ -152,4 +158,37 @@ public class CandidateController {
         // Trả về phản hồi
         return "Job unsaved successfully";
     }
+	//theo dõi một công ty
+	@PostMapping("followCompany/{id}")
+	@ResponseBody
+	public String followCompany (@PathVariable("id") int id) {
+		//lấy ra người dùng hiện tại
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		//xử lý việc lưu company
+		
+		FollowingCompany followingCompany = userService.followCompany(currentUser.getUser(), companyService.getCompanyById(id).get());
+		//Lưu followingCompany bào cơ sở dữ liệu
+		
+		
+		//thêm vào danh sách following của user luôn
+		currentUser.getUser().getFollowingCompanies().add(followingCompany);
+		return "following company successfully";
+	}
+	//huỷ theo dõi một công ty
+	@PostMapping("/unfollowCompany/{id}")
+	@ResponseBody
+	public String unfollowCompany(@PathVariable("id") int id) {
+		//lất ra người dùng hiện tại
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		//lấy ra FollowingCompany của công ty có id id
+		FollowingCompany toUnfollowCompany = userService.getFollowingCompanyByUserIdAndCompanyId(currentUser.getUser(), companyService.getCompanyById(id).get());
+		//xoá khỏi list của user
+		currentUser.getUser().getFollowingCompanies().remove(toUnfollowCompany);
+		
+		//xoá khỏi cơ sở dữ liệu
+		userService.unfollowCompany(currentUser.getUser(), companyService.getCompanyById(id).get());
+		return "unfollow company successfully";
+	}
 }

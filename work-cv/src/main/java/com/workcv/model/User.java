@@ -46,7 +46,8 @@ public class User {
 
 	private Company company;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
 	private List<FollowingCompany> followingCompanies;
 
 //	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

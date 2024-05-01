@@ -3,6 +3,7 @@ package com.workcv.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="following_company")
 public class FollowingCompany {
 
     @Id
