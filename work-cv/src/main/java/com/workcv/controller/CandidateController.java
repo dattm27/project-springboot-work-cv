@@ -44,7 +44,7 @@ import com.workcv.service.UserService;
 public class CandidateController {
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private CvService cvService;
 	@Autowired
@@ -53,7 +53,6 @@ public class CandidateController {
 	private JobService jobService;
 	@Autowired
 	private CompanyService companyService;
-	
 
 	public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/webapp/cv";
 
@@ -79,7 +78,7 @@ public class CandidateController {
 			Files.deleteIfExists(oldCvPath);
 			oldCv.setFilename(originalFilename);
 			currentUser.getUser().setCv(oldCv);
-			//Cập nhật lại trong cơ sở dữ liệu
+			// Cập nhật lại trong cơ sở dữ liệu
 			cvService.save(oldCv);
 
 		} else {
@@ -87,117 +86,132 @@ public class CandidateController {
 			CV cv = new CV();
 			cv.setFilename(originalFilename);
 			cv.setUser(user);
-			
+
 			cvService.save(cv);
 			currentUser.getUser().setCv(cv);
-			
+
 		}
 
 		redirectAttributes.addFlashAttribute("msg", "Cập nhật CV thành công");
 		return "redirect:/user/profile";
 	}
-	
-	//Nạp file CV của ứng viên lên
+
+	// Nạp file CV của ứng viên lên
 	@GetMapping("cv/{id}")
 	public ResponseEntity<Resource> getCV(@PathVariable("id") int id) throws IOException {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		//Get the cv from user
+		// Get the cv from user
 		Path cvPath = Paths.get(uploadDirectory, currentUser.getUser().getCv().getFilename());
-		//Fetching the image from that particular path
+		// Fetching the image from that particular path
 		Resource resource = new FileSystemResource(cvPath.toFile());
 		String contentType = Files.probeContentType(cvPath);
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
 	}
-	
+
 	@GetMapping("/apply/{id}")
 	public String getApplyForm(@PathVariable("id") int id, Model model) {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		Apply applied= applyService.getApply( currentUser.getId(), id);
-		
+		Apply applied = applyService.getApply(currentUser.getId(), id);
+
 		if (applied == null) {
 			model.addAttribute("id", id);
 			CV cv = currentUser.getUser().getCv();
 			model.addAttribute("cv", cv);
 			return "apply-form";
-		}
-		else {
+		} else {
 			model.addAttribute("error", "Bạn đã ứng tuyển công việc này");
 			return "custom-error";
 		}
-		
+
 	}
-	
+
 	@PostMapping("/saveJob/{id}")
-    @ResponseBody
-    public String saveJob(@PathVariable("id") int id) {
+	@ResponseBody
+	public String saveJob(@PathVariable("id") int id) {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		// Xử lý lưu công việc ở đây
-        SavedJob savedJob = userService.saveJob(currentUser.getUser(), jobService.getJobById(id));
-        currentUser.getUser().getSavedJobs().add(savedJob);
-        // Trả về phản hồi
-        return "Job saved successfully";
-    }
+		SavedJob savedJob = userService.saveJob(currentUser.getUser(), jobService.getJobById(id));
+		currentUser.getUser().getSavedJobs().add(savedJob);
+		// Trả về phản hồi
+		return "Job saved successfully";
+	}
+
 	@PostMapping("/unsaveJob/{id}")
-    @ResponseBody
-    public String unsaveJob(@PathVariable("id") int id) {
+	@ResponseBody
+	public String unsaveJob(@PathVariable("id") int id) {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		
-		//xoá khỏi list savedJob của currentUser luôn
-       int index = -1;
+
+		// xoá khỏi list savedJob của currentUser luôn
+		int index = -1;
 		for (SavedJob savedJob : currentUser.getUser().getSavedJobs()) {
-		    if (savedJob.getJob().getId() == id) {
-		    	index =  currentUser.getUser().getSavedJobs().indexOf(savedJob);
-		    	break;
-		    }
+			if (savedJob.getJob().getId() == id) {
+				index = currentUser.getUser().getSavedJobs().indexOf(savedJob);
+				break;
+			}
 		}
-		if ( index != -1 ) currentUser.getUser().getSavedJobs().remove(index);
-     // Xử lý lưu công việc ở đây
-        userService.unsaveJob(currentUser.getUser(), jobService.getJobById(id));
-        
-        // Trả về phản hồi
-        return "Job unsaved successfully";
-    }
-	//theo dõi một công ty
+		if (index != -1)
+			currentUser.getUser().getSavedJobs().remove(index);
+		// Xử lý lưu công việc ở đây
+		userService.unsaveJob(currentUser.getUser(), jobService.getJobById(id));
+
+		// Trả về phản hồi
+		return "Job unsaved successfully";
+	}
+
+	// theo dõi một công ty
 	@PostMapping("followCompany/{id}")
 	@ResponseBody
-	public String followCompany (@PathVariable("id") int id) {
-		//lấy ra người dùng hiện tại
+	public String followCompany(@PathVariable("id") int id) {
+		// lấy ra người dùng hiện tại
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		//xử lý việc lưu company
-		
-		FollowingCompany followingCompany = userService.followCompany(currentUser.getUser(), companyService.getCompanyById(id).get());
-		//Lưu followingCompany bào cơ sở dữ liệu
-		
-		
-		//thêm vào danh sách following của user luôn
+		// xử lý việc lưu company
+
+		FollowingCompany followingCompany = userService.followCompany(currentUser.getUser(),
+				companyService.getCompanyById(id).get());
+		// Lưu followingCompany bào cơ sở dữ liệu
+
+		// thêm vào danh sách following của user luôn
 		currentUser.getUser().getFollowingCompanies().add(followingCompany);
 		return "following company successfully";
 	}
-	//huỷ theo dõi một công ty
+
+	// huỷ theo dõi một công ty
 	@PostMapping("/unfollowCompany/{id}")
 	@ResponseBody
 	public String unfollowCompany(@PathVariable("id") int id) {
-		//lất ra người dùng hiện tại
+		// lất ra người dùng hiện tại
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		//lấy ra FollowingCompany của công ty có id id
-		FollowingCompany toUnfollowCompany = userService.getFollowingCompanyByUserIdAndCompanyId(currentUser.getUser(), companyService.getCompanyById(id).get());
-		//xoá khỏi list của user
-		currentUser.getUser().getFollowingCompanies().remove(toUnfollowCompany);
+		// lấy ra FollowingCompany của công ty có id id
+		//FollowingCompany toUnfollowCompany = userService.getFollowingCompanyByUserIdAndCompanyId(currentUser.getUser(),
+		//		companyService.getCompanyById(id).get());
+		// xoá khỏi list của user
+		//currentUser.getUser().getFollowingCompanies().remove(toUnfollowCompany);
+		// xoá khỏi list savedJob của currentUser luôn
+				int index = -1;
+				for (FollowingCompany followingCompany : currentUser.getUser().getFollowingCompanies()) {
+					if (followingCompany.getCompany().getId() == id) {
+						index = currentUser.getUser().getFollowingCompanies().indexOf(followingCompany);
+						break;
+					}
+				}
+				if (index != -1)
+					currentUser.getUser().getFollowingCompanies().remove(index);
 		
-		//xoá khỏi cơ sở dữ liệu
+		// xoá khỏi cơ sở dữ liệu
 		userService.unfollowCompany(currentUser.getUser(), companyService.getCompanyById(id).get());
+		
 		return "unfollow company successfully";
 	}
-	
+
 	@GetMapping("/saved-job-list")
 	public String showSavedJobsList(Model model) {
-		//Lấy ra người dùng hiện tại
+		// Lấy ra người dùng hiện tại
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		model.addAttribute("role", currentUser.getRole());
@@ -206,9 +220,25 @@ public class CandidateController {
 		List<Job> savedJobList = new ArrayList<>();
 
 		for (SavedJob savedJob : savedJobs) {
-		    savedJobList.add(savedJob.getJob());
+			savedJobList.add(savedJob.getJob());
 		}
-		model.addAttribute("jobs",savedJobList);
+		model.addAttribute("jobs", savedJobList);
 		return "saved-job-list";
+	}
+
+	@GetMapping("/following-company")
+	public String showFollowingCompanyList(Model model) {
+		// Lấy ra người dùng hiện tại
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		model.addAttribute("role", currentUser.getRole());
+		model.addAttribute("username", currentUser.getFullName());
+		List<FollowingCompany> followingCompanies = currentUser.getUser().getFollowingCompanies();
+		List<Company> followingCompaniesList = new ArrayList<>();
+		for(FollowingCompany followingCompany : followingCompanies ) {
+			followingCompaniesList.add(followingCompany.getCompany());
+		}
+		model.addAttribute("companies",followingCompaniesList);
+		return "following-company-list";
 	}
 }
