@@ -57,11 +57,11 @@ public class CustomUserDetails implements UserDetails {
 		// TODO Auto-generated method stub
 		return true;
 	}
-
+	//kiểm tra xem tài khoản đã kích hoạt chưa thì mới cho đăng nhập
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return true;
+		
+		return (user.getStatus()==1);
 	}
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -77,4 +77,5 @@ public class CustomUserDetails implements UserDetails {
 	public User getUser () {
 		return user;
 	}
+	
 }

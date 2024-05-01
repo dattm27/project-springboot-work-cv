@@ -1,10 +1,15 @@
 package com.workcv.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+
 
 import com.workcv.model.Company;
 import com.workcv.model.FollowingCompany;
@@ -14,6 +19,10 @@ import com.workcv.model.User;
 import com.workcv.repository.FollowingCompanyRepository;
 import com.workcv.repository.SavedJobRepository;
 import com.workcv.repository.UserRepository;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import net.bytebuddy.utility.RandomString;
 @Service
 public class UserServiceImpl implements UserService {
 	
@@ -23,6 +32,12 @@ public class UserServiceImpl implements UserService {
 	private FollowingCompanyRepository followingCompanyRepository;
 	@Autowired 
 	private  SavedJobRepository savedJobRepository;
+	private final JavaMailSender mailSender;
+
+    UserServiceImpl(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+    
 	@Override
 	public List<User> getAllUsers() {
 		
@@ -36,10 +51,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean registerUser(String fullName, String email, String password, String role) {
+	public User registerUser(String fullName, String email, String password, String role) {
 		// Kiểm tra xem email đã tồn tại chưa
         if (userRepository.findByEmail(email) != null) {
-            return false; // Email đã tồn tại
+            return null; // Email đã tồn tại
         }
         else {
         	// Tạo người dùng mới và lưu vào cơ sở dữ liệu
@@ -48,10 +63,37 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email);
             user.setPassword(password);
             user.setRole(role); // Vai trò của người dùng: ứng viên hoặc nhà tuyển dụng
-            user.setStatus(1);
-            userRepository.save(user);
-    		return true;
+            user.setStatus(0); //chưa kích hoạt
+       
+            String randomCode = RandomString.make(64);
+            user.setVerificationCode(randomCode);
+          
+        return     userRepository.save(user);
+            
+    
+    	
         }
+		
+	}
+	//gửi mã xác thực vào email cho người dùng khi đăng ký tài khoản mới
+	@Override
+	public void sendVerificationCode(User user, String siteURL) throws UnsupportedEncodingException, MessagingException {
+		String subject = "Vui lòng xác nhận đăng ký tài khoản";
+		String sendername  ="Work CV Team";
+		String mailContent = "<p>Xin chào, " + user.getFullName() + ", </p>";
+		mailContent+="<p>Vui lòng click vào link dưới đây để xác nhận đăng ký tài khoản tại Work CV: </p>";
+		String verifyURL = siteURL + "/verify?code=" +user.getVerificationCode();
+		mailContent+="<h3><a href=\""+ verifyURL +"\">Xác nhận </a></h3>"  ;
+		mailContent+="<p>Xin chân thành cảm ơn, Work CV Team </p>";
+		
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		helper.setFrom("dattran2003.ttn@gmail.com", sendername);
+		helper.setTo(user.getEmail());
+		helper.setSubject(subject);
+		helper.setText(mailContent, true);
+		
+		mailSender.send(message);
 		
 	}
 	@Override
@@ -127,6 +169,21 @@ public class UserServiceImpl implements UserService {
 	public FollowingCompany getFollowingCompanyByUserIdAndCompanyId(User user, Company company) {
 		FollowingCompany followingCompany = followingCompanyRepository.findByUserAndCompany(user, company);
 		return followingCompany;
+	}
+
+	@Override
+	public boolean verify(String verificationCode) {
+		User user = userRepository.findByVerificationCode(verificationCode);
+		//không thấy tài khoản hoặc đã được kích hoạt rồi
+		if(user == null || user.getStatus()==1) {
+			return false;
+		}
+		else {
+			user.setStatus(1);
+			userRepository.save(user);
+			return true;
+		}
+		
 	}
 	
 

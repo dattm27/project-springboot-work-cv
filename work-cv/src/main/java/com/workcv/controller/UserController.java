@@ -1,6 +1,7 @@
 package com.workcv.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.core.io.Resource;
+import org.springframework.data.repository.query.Param;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,7 @@ import com.workcv.model.CustomUserDetails;
 import com.workcv.model.User;
 import com.workcv.service.UserService;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -55,21 +59,43 @@ public class UserController {
 
 	@PostMapping("/signup")
 	public String processSignup(@RequestParam("email") String email, @RequestParam("full-name") String fullName,
-			@RequestParam("password") String password, @RequestParam("role") String role, Model model) {
+			@RequestParam("password") String password, @RequestParam("role") String role, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) throws UnsupportedEncodingException, MessagingException {
 		// Mã hóa mật khẩu
 		String encodedPassword = passwordEncoder.encode(password);
 		// kiểm tra email trùng lặp
-		boolean success = userService.registerUser(fullName, email, encodedPassword, role);
-		if (!success) {
+		User user = userService.registerUser(fullName, email, encodedPassword, role);
+		//tạo link để gửi người dùng bấm vào xác thực tài khoản (link này sau đó sẽ được thêm mã xác thực vào)
+		String siteURL = request.getRequestURL().toString();
+		userService.sendVerificationCode(user,  siteURL);
+		if (user == null) {
 			// nếu đã tồn tại email như thế
 			model.addAttribute("error", true);
 			return "sign-up-form";
 		} else {
+			
 			// dang ky thanh cong
-			model.addAttribute("sign_up_success", true);
+//			model.addAttribute("sign_up_success", true);
+			model.addAttribute("msg", "Đăng ký thành công! Kiểm tra email để xác thực tài khoản");
 			return "login-form";
 		}
 	}
+	
+	//xác thực người dùng
+	@GetMapping("/signup/verify")
+	public String verifyAccount(@RequestParam("code") String code, Model model) {
+		
+		boolean verify = userService.verify(code);
+		if (verify) {
+			String msg = "Xác thực thành công! Vui lòng đăng nhập!";
+			model.addAttribute("msg", msg);
+		}
+		else {
+			String error = "Gặp lỗi khi xác thực";
+			model.addAttribute("error",error);	
+		}
+		return "login-form";
+	}
+	
 
 //	Chỉnh sửa thông tin cá nhân của người dùng
 	@GetMapping("profile")

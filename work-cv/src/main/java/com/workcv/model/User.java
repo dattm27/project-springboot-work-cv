@@ -43,8 +43,10 @@ public class User {
 	@OneToOne(mappedBy = "user")
 	private CV cv;
 	@OneToOne(mappedBy = "user")
-
 	private Company company;
+	@Column(name = "verification_code", updatable = false)
+	private String verificationCode;
+	
 
 //	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
@@ -165,6 +167,14 @@ public class User {
 
 	public void setSavedJobs(List<SavedJob> savedJobs) {
 		this.savedJobs = savedJobs;
+	}
+
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
 	}
 
 }

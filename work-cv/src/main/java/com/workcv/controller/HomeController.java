@@ -91,8 +91,15 @@ public class HomeController {
 		return  "This is employer" ;
 	}
 	@GetMapping("/signin")
-	public String signin() {
-		
+	public String signin(Model model, HttpServletRequest request) {
+	
+		// Kiểm tra xem có flash attributes từ redirect trước đó không
+	    if (model.containsAttribute("msg")) {
+	        model.addAttribute("msg", model.getAttribute("msg"));
+	    }
+	    if (model.containsAttribute("error")) {
+	        model.addAttribute("error", model.getAttribute("error"));
+	    }
 		return  "login-form" ;
 	}
 	@GetMapping("/signout")
