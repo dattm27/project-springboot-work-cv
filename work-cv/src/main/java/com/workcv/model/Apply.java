@@ -29,8 +29,8 @@ public class Apply {
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
     
-    @OneToOne
-	@JoinColumn(name = "cv_id",  referencedColumnName = "id")
+    @ManyToOne
+	@JoinColumn(name = "cv_id")
 	private CV cv;
     
 	public int getId() {
