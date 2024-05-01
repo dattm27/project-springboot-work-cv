@@ -217,7 +217,7 @@ public class EmployerController {
 		model.addAttribute("username", currentUser.getFullName());
 		model.addAttribute("role", currentUser.getRole());
 		int companyId = currentUser.getUser().getCompany().getId();
-		System.out.print("Danh sách ứng viên " + companyId);
+		
 
 		List<Object[]> applicationDetails = applyService.getApplicationDetailsByCompanyId(companyId);
 
@@ -270,4 +270,6 @@ public class EmployerController {
 
 		return "redirect:/employer/applicants-list";
 	}
+	
+	
 }

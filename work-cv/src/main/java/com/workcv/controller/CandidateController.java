@@ -188,24 +188,25 @@ public class CandidateController {
 		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		// lấy ra FollowingCompany của công ty có id id
-		//FollowingCompany toUnfollowCompany = userService.getFollowingCompanyByUserIdAndCompanyId(currentUser.getUser(),
-		//		companyService.getCompanyById(id).get());
+		// FollowingCompany toUnfollowCompany =
+		// userService.getFollowingCompanyByUserIdAndCompanyId(currentUser.getUser(),
+		// companyService.getCompanyById(id).get());
 		// xoá khỏi list của user
-		//currentUser.getUser().getFollowingCompanies().remove(toUnfollowCompany);
+		// currentUser.getUser().getFollowingCompanies().remove(toUnfollowCompany);
 		// xoá khỏi list savedJob của currentUser luôn
-				int index = -1;
-				for (FollowingCompany followingCompany : currentUser.getUser().getFollowingCompanies()) {
-					if (followingCompany.getCompany().getId() == id) {
-						index = currentUser.getUser().getFollowingCompanies().indexOf(followingCompany);
-						break;
-					}
-				}
-				if (index != -1)
-					currentUser.getUser().getFollowingCompanies().remove(index);
-		
+		int index = -1;
+		for (FollowingCompany followingCompany : currentUser.getUser().getFollowingCompanies()) {
+			if (followingCompany.getCompany().getId() == id) {
+				index = currentUser.getUser().getFollowingCompanies().indexOf(followingCompany);
+				break;
+			}
+		}
+		if (index != -1)
+			currentUser.getUser().getFollowingCompanies().remove(index);
+
 		// xoá khỏi cơ sở dữ liệu
 		userService.unfollowCompany(currentUser.getUser(), companyService.getCompanyById(id).get());
-		
+
 		return "unfollow company successfully";
 	}
 
@@ -226,6 +227,7 @@ public class CandidateController {
 		return "saved-job-list";
 	}
 
+	// danh sách công ty mà một người dùng theo dõi
 	@GetMapping("/following-company")
 	public String showFollowingCompanyList(Model model) {
 		// Lấy ra người dùng hiện tại
@@ -235,10 +237,33 @@ public class CandidateController {
 		model.addAttribute("username", currentUser.getFullName());
 		List<FollowingCompany> followingCompanies = currentUser.getUser().getFollowingCompanies();
 		List<Company> followingCompaniesList = new ArrayList<>();
-		for(FollowingCompany followingCompany : followingCompanies ) {
+		for (FollowingCompany followingCompany : followingCompanies) {
 			followingCompaniesList.add(followingCompany.getCompany());
 		}
-		model.addAttribute("companies",followingCompaniesList);
+		model.addAttribute("companies", followingCompaniesList);
 		return "following-company-list";
+	}
+
+	// lấy ra danh sách công việc đã ứng tuyển
+	@GetMapping("/my-applied-jobs")
+	public String showMyAppliedJobs(Model model) {
+		// Lấy ra người dùng hiện tại
+		CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		model.addAttribute("role", currentUser.getRole());
+		model.addAttribute("username", currentUser.getFullName());
+		List<Object[]> myApplications = applyService.getAppliedJobs(currentUser.getId());
+		if (myApplications != null && !myApplications.isEmpty())model.addAttribute("applications", myApplications);
+		
+		System.out.println("Danh sách công việc\n");
+		for (Object[] application : myApplications) {
+		    System.out.println("Title: " + application[0]);
+		    System.out.println("Type: " + application[1]);
+		    System.out.println("Created At: " + application[2]);
+		    System.out.println("Company: " + application[3]);
+		    System.out.println("Status: " + application[4]);
+		    System.out.println("-----------------------------------");
+		}
+		return "my-applied-jobs";
 	}
 }

@@ -35,5 +35,10 @@ public class ApplyServiceImpl implements ApplyService {
 		Optional<Apply> apply = applyRepository.findById(id);
 		return apply;
 	}
+	@Override
+	public List<Object[]> getAppliedJobs(int user_id) {
+		
+		return applyRepository.findApplicationsByUserId(user_id);
+	}
 
 }
